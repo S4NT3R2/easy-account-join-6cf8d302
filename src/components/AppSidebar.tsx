@@ -5,6 +5,7 @@ import {
   SheetContent,
   SheetHeader,
 } from "@/components/ui/sheet";
+import { useNavigate } from "react-router-dom";
 
 interface AppSidebarProps {
   open: boolean;
@@ -12,6 +13,13 @@ interface AppSidebarProps {
 }
 
 export function AppSidebar({ open, onOpenChange }: AppSidebarProps) {
+  const navigate = useNavigate();
+
+  const handleItemClick = (path: string) => {
+    onOpenChange(false); // Close sidebar
+    navigate(path); // Navigate to the path
+  };
+
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="left" className="w-80 bg-[#1A1F2C] border-r-0 p-0">
@@ -27,7 +35,10 @@ export function AppSidebar({ open, onOpenChange }: AppSidebarProps) {
             </div>
             <div className="flex-1">
               <h3 className="text-lg font-semibold text-white">Samantha Smith</h3>
-              <button className="text-sm text-muted-foreground hover:text-primary transition-colors">
+              <button 
+                onClick={() => handleItemClick('/profile')}
+                className="text-sm text-muted-foreground hover:text-primary transition-colors"
+              >
                 View Profile
               </button>
             </div>
@@ -46,12 +57,13 @@ export function AppSidebar({ open, onOpenChange }: AppSidebarProps) {
             {menuItems.map((item) => (
               <button
                 key={item.label}
-                className="w-full flex items-center gap-3 px-4 py-3 text-muted-foreground hover:text-primary rounded-lg transition-colors group"
+                onClick={() => handleItemClick(item.path)}
+                className="w-full flex items-center gap-3 px-4 py-3 text-muted-foreground hover:text-white rounded-lg transition-all duration-200 hover:bg-white/5 active:bg-white/10 group"
               >
-                <div className="w-10 h-10 rounded-full bg-muted/30 flex items-center justify-center group-hover:bg-primary/10">
-                  <item.icon className="w-5 h-5" />
+                <div className="w-10 h-10 rounded-full bg-muted/30 flex items-center justify-center group-hover:bg-primary/10 transition-colors">
+                  <item.icon className="w-5 h-5 group-hover:text-primary transition-colors" />
                 </div>
-                <span className="text-sm font-medium">{item.label}</span>
+                <span className="text-sm font-medium group-hover:text-primary transition-colors">{item.label}</span>
               </button>
             ))}
           </nav>
@@ -65,29 +77,36 @@ const menuItems = [
   {
     icon: Shield,
     label: "My Bookings",
+    path: "/bookings",
   },
   {
     icon: Car,
     label: "My Cars",
+    path: "/cars",
   },
   {
     icon: MapPin,
     label: "My Addresses",
+    path: "/addresses",
   },
   {
     icon: Heart,
     label: "Favorites",
+    path: "/favorites",
   },
   {
     icon: Globe,
     label: "Change Language",
+    path: "/language",
   },
   {
     icon: MessageSquare,
     label: "Contact us",
+    path: "/contact",
   },
   {
     icon: LogOut,
     label: "Logout",
+    path: "/login",
   },
 ];
