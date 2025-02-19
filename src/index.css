@@ -25,20 +25,38 @@
 }
 
 .glass-morphism {
-  background: rgba(26, 31, 44, 0.8);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: rgba(26, 31, 44, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
 }
 
 .gradient-button {
-  background: linear-gradient(to right, #1eefac, #1EAEDB);
+  background: linear-gradient(135deg, #1eefac, #1EAEDB);
   transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.gradient-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, rgba(255,255,255,0.2), transparent);
+  transition: 0.5s;
+}
+
+.gradient-button:hover::before {
+  left: 100%;
 }
 
 .gradient-button:hover {
-  opacity: 0.9;
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(30, 239, 172, 0.2);
 }
 
 .form-input {
@@ -46,5 +64,61 @@
 }
 
 .social-button {
-  @apply flex items-center justify-center gap-2 px-6 py-3 rounded-lg border border-border hover:bg-muted transition-all duration-200;
+  @apply flex items-center justify-center gap-3 px-6 py-3 rounded-lg border border-border transition-all duration-300 hover:scale-105 hover:border-primary relative overflow-hidden;
+  background: rgba(255, 255, 255, 0.03);
 }
+
+.social-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  transition: 0.5s;
+}
+
+.social-button:hover::before {
+  left: 100%;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+.float-animation {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .glass-morphism {
+    @apply mx-4 p-6;
+  }
+  
+  .social-button {
+    @apply px-4 py-2.5 text-sm;
+  }
+
+  .form-input {
+    @apply px-3 py-2.5 text-sm;
+  }
+}
+
+@media (min-width: 641px) {
+  .glass-morphism {
+    transform: scale(0.98);
+    opacity: 0;
+    animation: scaleIn 0.5s ease forwards;
+  }
+}
+
+@keyframes scaleIn {
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
