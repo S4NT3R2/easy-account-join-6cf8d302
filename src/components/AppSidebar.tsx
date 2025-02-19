@@ -3,7 +3,6 @@ import { X, Shield, Car, MapPin, Heart, Globe, MessageSquare, LogOut } from "luc
 import {
   Sheet,
   SheetContent,
-  SheetHeader,
 } from "@/components/ui/sheet";
 import { useNavigate } from "react-router-dom";
 
@@ -16,16 +15,16 @@ export function AppSidebar({ open, onOpenChange }: AppSidebarProps) {
   const navigate = useNavigate();
 
   const handleItemClick = (path: string) => {
-    onOpenChange(false); // Close sidebar
-    navigate(path); // Navigate to the path
+    onOpenChange(false);
+    navigate(path);
   };
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="left" className="w-80 bg-[#1A1F2C] border-r-0 p-0">
+      <SheetContent side="left" className="w-[300px] p-0 bg-[#1A1F2C]">
         {/* Profile Section */}
         <div className="p-6 border-b border-white/5">
-          <div className="flex items-center gap-4 mb-4">
+          <div className="flex items-center gap-4">
             <div className="w-16 h-16 rounded-full overflow-hidden bg-muted">
               <img 
                 src="/lovable-uploads/1775f99c-0d21-45df-be77-82e3edd8658b.png" 
