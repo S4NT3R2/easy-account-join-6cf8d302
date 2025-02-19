@@ -19,10 +19,17 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={<Navigate to="/login" replace />} />
+            <Route path="/" element={<Navigate to="/home" replace />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/home" element={<Home />} />
+            <Route path="/profile" element={<Home />} /> {/* Temporary redirect to Home */}
+            <Route path="/bookings" element={<Home />} /> {/* Temporary redirect to Home */}
+            <Route path="/cars" element={<Home />} /> {/* Temporary redirect to Home */}
+            <Route path="/addresses" element={<Home />} /> {/* Temporary redirect to Home */}
+            <Route path="/favorites" element={<Home />} /> {/* Temporary redirect to Home */}
+            <Route path="/language" element={<Home />} /> {/* Temporary redirect to Home */}
+            <Route path="/contact" element={<Home />} /> {/* Temporary redirect to Home */}
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
