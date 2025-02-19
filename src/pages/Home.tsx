@@ -1,10 +1,11 @@
 
 import { useState } from "react";
-import { Car, Calendar, Settings, Search, MapPin } from "lucide-react";
+import { Car, Calendar, Settings, Search, MapPin, Menu } from "lucide-react";
 import { format } from "date-fns";
 import { SelectCarSheet } from "@/components/SelectCarSheet";
 import { ServicesSheet } from "@/components/ServicesSheet";
 import { DateTimeSheet } from "@/components/DateTimeSheet";
+import { AppSidebar } from "@/components/AppSidebar";
 
 interface Car {
   id: string;
@@ -27,6 +28,7 @@ const Home = () => {
   const [selectCarOpen, setSelectCarOpen] = useState(false);
   const [servicesOpen, setServicesOpen] = useState(false);
   const [dateTimeOpen, setDateTimeOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   
   // Selection state
   const [selectedCar, setSelectedCar] = useState<Car | null>(null);
@@ -41,6 +43,14 @@ const Home = () => {
           <div className="absolute inset-0 bg-[url('/lovable-uploads/75aaeeac-3b66-4d69-a8da-b12e9346e9c0.png')] bg-cover bg-center" />
           <div className="absolute inset-0 bg-gradient-to-t from-[#1A1F2C] via-[#1A1F2C]/80 to-transparent" />
         </div>
+        
+        {/* Menu Button */}
+        <button 
+          onClick={() => setSidebarOpen(true)}
+          className="absolute top-4 left-4 z-10 w-10 h-10 rounded-full bg-background/10 backdrop-blur-md flex items-center justify-center text-white hover:bg-background/20 transition-colors"
+        >
+          <Menu className="w-5 h-5" />
+        </button>
         
         {/* Title Section */}
         <div className="relative z-10 pt-8 px-4">
@@ -134,6 +144,11 @@ const Home = () => {
         onOpenChange={setDateTimeOpen}
         selectedDateTime={selectedDateTime}
         onSelectDateTime={setSelectedDateTime}
+      />
+
+      <AppSidebar 
+        open={sidebarOpen} 
+        onOpenChange={setSidebarOpen}
       />
     </div>
   );
