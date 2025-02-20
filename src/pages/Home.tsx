@@ -8,31 +8,35 @@ const HomePage = () => {
       <div className="absolute inset-0 bg-[#1A1F2C]">
         {/* Map placeholder - dark themed */}
         <div className="h-full w-full bg-[#1A1F2C] opacity-80">
-          {/* Add actual map implementation here */}
+          {/* Map with glowing point at Chillicothe */}
+          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+            <div className="w-3 h-3 rounded-full bg-primary animate-pulse" />
+            <div className="absolute inset-0 bg-primary/30 rounded-full blur-lg animate-pulse" />
+          </div>
         </div>
       </div>
 
       {/* Bottom Action Panel */}
-      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-[#1A1F2C] to-transparent pt-20">
-        <div className="glass-morphism mx-4 mb-4 rounded-xl p-6 space-y-6">
+      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-[#1A1F2C] via-[#1A1F2C]/80 to-transparent pt-20">
+        <div className="glass-morphism mx-4 mb-4 rounded-2xl p-6 space-y-6 bg-[#232836]/90">
           {/* Action Buttons */}
           <div className="grid grid-cols-3 gap-4">
             <button className="flex flex-col items-center space-y-2">
-              <div className="w-12 h-12 rounded-full bg-muted/30 flex items-center justify-center">
+              <div className="w-14 h-14 rounded-full bg-[#2A2F3C] flex items-center justify-center">
                 <Car className="w-6 h-6 text-primary" />
               </div>
               <span className="text-sm text-white">Select Car</span>
             </button>
             
             <button className="flex flex-col items-center space-y-2">
-              <div className="w-12 h-12 rounded-full bg-muted/30 flex items-center justify-center">
+              <div className="w-14 h-14 rounded-full bg-[#2A2F3C] flex items-center justify-center">
                 <Settings className="w-6 h-6 text-primary" />
               </div>
               <span className="text-sm text-white">Services</span>
             </button>
             
             <button className="flex flex-col items-center space-y-2">
-              <div className="w-12 h-12 rounded-full bg-muted/30 flex items-center justify-center">
+              <div className="w-14 h-14 rounded-full bg-[#2A2F3C] flex items-center justify-center">
                 <Calendar className="w-6 h-6 text-primary" />
               </div>
               <span className="text-sm text-white">When?</span>
@@ -40,9 +44,11 @@ const HomePage = () => {
           </div>
 
           {/* Location Search */}
-          <button className="w-full flex items-center gap-3 p-4 rounded-lg bg-muted/30 hover:bg-muted/40 transition-colors">
+          <button className="w-full flex items-center gap-3 p-4 rounded-xl bg-[#2A2F3C] hover:bg-[#2F3447] transition-colors">
             <div className="flex items-center gap-3 flex-1">
-              <MapPin className="w-5 h-5 text-primary" />
+              <div className="w-12 h-12 rounded-full bg-[#232836] flex items-center justify-center">
+                <MapPin className="w-5 h-5 text-primary" />
+              </div>
               <div className="text-left">
                 <span className="text-sm text-white block">Service Location</span>
                 <span className="text-xs text-gray-400">104, Hilton Street, Chillicolate, USA</span>
