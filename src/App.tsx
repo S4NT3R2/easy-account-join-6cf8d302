@@ -19,19 +19,19 @@ const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <div className="min-h-screen bg-[url('/lovable-uploads/75aaeeac-3b66-4d69-a8da-b12e9346e9c0.png')] bg-cover bg-center">
-          <button
-            onClick={() => setSidebarOpen(true)}
-            className="fixed top-4 left-4 z-50 p-2 rounded-lg bg-black/20 backdrop-blur-sm hover:bg-black/30 transition-colors"
-          >
-            <Menu className="h-6 w-6 text-white" />
-          </button>
-          
-          <AppSidebar open={sidebarOpen} onOpenChange={setSidebarOpen} />
-          <Toaster />
-          <Sonner />
-          
-          <BrowserRouter>
+        <BrowserRouter>
+          <div className="min-h-screen bg-[url('/lovable-uploads/75aaeeac-3b66-4d69-a8da-b12e9346e9c0.png')] bg-cover bg-center">
+            <button
+              onClick={() => setSidebarOpen(true)}
+              className="fixed top-4 left-4 z-50 p-2 rounded-lg bg-black/20 backdrop-blur-sm hover:bg-black/30 transition-colors"
+            >
+              <Menu className="h-6 w-6 text-white" />
+            </button>
+            
+            <AppSidebar open={sidebarOpen} onOpenChange={setSidebarOpen} />
+            <Toaster />
+            <Sonner />
+            
             <Routes>
               <Route path="/" element={<Navigate to="/login" replace />} />
               <Route path="/login" element={<Login />} />
@@ -46,8 +46,8 @@ const App = () => {
               <Route path="/contact" element={<Navigate to="/login" replace />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
-          </BrowserRouter>
-        </div>
+          </div>
+        </BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>
   );
