@@ -76,7 +76,7 @@ const menuItems = [
   {
     icon: Shield,
     label: "My Bookings",
-    path: "/bookings",
+    path: "/booking-details", // Updated from "/bookings" to "/booking-details"
   },
   {
     icon: Car,
@@ -109,3 +109,4 @@ const menuItems = [
     path: "/login",
   },
 ];
+
