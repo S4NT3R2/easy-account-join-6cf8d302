@@ -10,6 +10,7 @@ import { Menu } from "lucide-react";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import NotFound from "./pages/NotFound";
+import HomePage from "./pages/Home";
 
 const queryClient = new QueryClient();
 
@@ -19,7 +20,7 @@ const AppContent = () => {
   const showSidebar = location.pathname === '/home';
 
   return (
-    <div className="min-h-screen bg-[url('/lovable-uploads/75aaeeac-3b66-4d69-a8da-b12e9346e9c0.png')] bg-cover bg-center">
+    <div className="min-h-screen bg-[#1A1F2C]">
       {showSidebar && (
         <>
           <button
@@ -39,7 +40,7 @@ const AppContent = () => {
         <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
-        <Route path="/home" element={<div className="p-4">Home Page</div>} />
+        <Route path="/home" element={<HomePage />} />
         <Route path="/profile" element={<Navigate to="/home" replace />} />
         <Route path="/bookings" element={<Navigate to="/home" replace />} />
         <Route path="/cars" element={<Navigate to="/home" replace />} />
