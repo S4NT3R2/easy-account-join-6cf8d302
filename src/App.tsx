@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-route
 import { AppSidebar } from "./components/AppSidebar";
 import { useState } from "react";
 import { Menu } from "lucide-react";
+import { SplashScreen } from "./components/SplashScreen";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import NotFound from "./pages/NotFound";
@@ -32,7 +33,7 @@ const queryClient = new QueryClient({
 const AppContent = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
-  const showSidebar = !['/login', '/signup'].includes(location.pathname);
+  const showSidebar = !['/login', '/signup', '/'].includes(location.pathname);
 
   return (
     <div className="min-h-screen bg-[#1A1F2C]">
@@ -49,7 +50,7 @@ const AppContent = () => {
       )}
       
       <Routes>
-        <Route path="/" element={<Navigate to="/login" replace />} />
+        <Route path="/" element={<SplashScreen />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/home" element={<HomePage />} />
@@ -62,7 +63,7 @@ const AppContent = () => {
         <Route path="/contact" element={<ContactPage />} />
         <Route path="/favorites" element={<FavoritesPage />} />
         <Route path="/profile" element={<Navigate to="/home" replace />} />
-        <Route path="/bookings" element={<Navigate to="/home" replace />} />
+        <Route path="/bookings" element={<Navigate to="/booking-details" replace />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
 
