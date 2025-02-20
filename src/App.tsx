@@ -1,7 +1,7 @@
 
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
+import { Toaster } from "./components/ui/toaster";
+import { Toaster as Sonner } from "./components/ui/sonner";
+import { TooltipProvider } from "./components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { AppSidebar } from "./components/AppSidebar";
@@ -16,8 +16,17 @@ import AddCarPage from "./pages/AddCar";
 import AddressesPage from "./pages/Addresses";
 import LanguagePage from "./pages/Language";
 
-const queryClient = new QueryClient();
+// Create QueryClient instance outside of component
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: false,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
+// Separate component for routes to avoid context issues
 const AppContent = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
@@ -37,9 +46,6 @@ const AppContent = () => {
         </>
       )}
       
-      <Toaster />
-      <Sonner />
-      
       <Routes>
         <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="/login" element={<Login />} />
@@ -55,10 +61,15 @@ const AppContent = () => {
         <Route path="/contact" element={<Navigate to="/home" replace />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
+
+      {/* Move toasters outside of Routes to avoid remounting */}
+      <Toaster />
+      <Sonner />
     </div>
   );
 };
 
+// Main App component
 const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
