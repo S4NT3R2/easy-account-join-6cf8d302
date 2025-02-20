@@ -1,9 +1,11 @@
 
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Car, Facebook, ChevronRight } from "lucide-react";
+import { toast } from "sonner";
 
 const Signup = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -12,16 +14,24 @@ const Signup = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Add form validation and submission logic here
+    
+    if (!formData.name || !formData.email || !formData.phoneNumber) {
+      toast.error("Please fill in all fields");
+      return;
+    }
+
+    // Here you would typically make an API call to create the account
+    toast.success("Account created successfully!");
+    navigate("/login");
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-[#1A1F2C]">
-      <div className="w-full max-w-md">
+      <div className="w-full max-w-md animate-fadeIn">
         {/* Logo Section */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-3 mb-4">
-            <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center animate-pulse">
+            <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center">
               <Car className="text-background w-6 h-6" />
             </div>
           </div>
@@ -39,6 +49,7 @@ const Signup = () => {
                 placeholder="Enter your full name"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                required
               />
             </div>
 
@@ -50,6 +61,7 @@ const Signup = () => {
                 placeholder="Enter your email"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                required
               />
             </div>
 
@@ -61,6 +73,7 @@ const Signup = () => {
                 placeholder="Enter your phone number"
                 value={formData.phoneNumber}
                 onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
+                required
               />
             </div>
 
