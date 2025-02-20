@@ -16,8 +16,10 @@ import AddCarPage from "./pages/AddCar";
 import AddressesPage from "./pages/Addresses";
 import AddLocationPage from "./pages/AddLocation";
 import LanguagePage from "./pages/Language";
+import BookingDetailsPage from "./pages/BookingDetails";
+import ContactPage from "./pages/Contact";
+import FavoritesPage from "./pages/Favorites";
 
-// Create QueryClient instance outside of component
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -27,7 +29,6 @@ const queryClient = new QueryClient({
   },
 });
 
-// Separate component for routes to avoid context issues
 const AppContent = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
@@ -57,21 +58,20 @@ const AppContent = () => {
         <Route path="/addresses" element={<AddressesPage />} />
         <Route path="/addresses/add" element={<AddLocationPage />} />
         <Route path="/language" element={<LanguagePage />} />
+        <Route path="/booking-details" element={<BookingDetailsPage />} />
+        <Route path="/contact" element={<ContactPage />} />
+        <Route path="/favorites" element={<FavoritesPage />} />
         <Route path="/profile" element={<Navigate to="/home" replace />} />
         <Route path="/bookings" element={<Navigate to="/home" replace />} />
-        <Route path="/favorites" element={<Navigate to="/home" replace />} />
-        <Route path="/contact" element={<Navigate to="/home" replace />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
 
-      {/* Move toasters outside of Routes to avoid remounting */}
       <Toaster />
       <Sonner />
     </div>
   );
 };
 
-// Main App component
 const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
