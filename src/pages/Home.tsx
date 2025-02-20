@@ -1,9 +1,17 @@
 
-import { Car, Settings, Calendar, MapPin, Search } from "lucide-react";
-import { useState } from "react";
+import { Car, Settings, Calendar, MapPin, Search, Phone, Heart, Navigation2 } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
 import { SelectCarSheet } from "@/components/SelectCarSheet";
 import { ServicesSheet } from "@/components/ServicesSheet";
 import { DateTimeSheet } from "@/components/DateTimeSheet";
+import mapboxgl from 'mapbox-gl';
+import 'mapbox-gl/dist/mapbox-gl.css';
+import { useNavigate } from "react-router-dom";
+import { Tab } from "@headlessui/react";
+import { toast } from "@/hooks/use-toast";
+
+// Temporary access token - in production, this should be handled securely
+mapboxgl.accessToken = 'YOUR_MAPBOX_ACCESS_TOKEN';
 
 interface Service {
   id: string;
@@ -19,7 +27,37 @@ interface Car {
   image: string;
 }
 
+interface ServiceProvider {
+  id: string;
+  name: string;
+  address: string;
+  rating: number;
+  distance: string;
+  cost: number;
+  image: string;
+  location: [number, number];
+}
+
+const serviceProviders: ServiceProvider[] = [
+  {
+    id: "1",
+    name: "Quickwash Services",
+    address: "104, Hilton Street, Chillicolate, USA",
+    rating: 4.5,
+    distance: "2.5 km",
+    cost: 60,
+    image: "/lovable-uploads/480bcf4d-f31d-4960-a1f6-2805e938dbe2.png",
+    location: [-93.552, 40.0215],
+  },
+  // Add more service providers here
+];
+
 const HomePage = () => {
+  const navigate = useNavigate();
+  const mapContainer = useRef<HTMLDivElement>(null);
+  const map = useRef<mapboxgl.Map | null>(null);
+  const [selectedProvider, setSelectedProvider] = useState<ServiceProvider | null>(null);
+  
   const [isSelectCarOpen, setIsSelectCarOpen] = useState(false);
   const [isServicesOpen, setIsServicesOpen] = useState(false);
   const [isDateTimeOpen, setIsDateTimeOpen] = useState(false);
@@ -27,19 +65,97 @@ const HomePage = () => {
   const [selectedService, setSelectedService] = useState<Service | null>(null);
   const [selectedDateTime, setSelectedDateTime] = useState<Date | null>(null);
 
+  useEffect(() => {
+    if (!mapContainer.current) return;
+
+    map.current = new mapboxgl.Map({
+      container: mapContainer.current,
+      style: 'mapbox://styles/mapbox/dark-v11',
+      center: [-93.552, 40.0215], // Chillicothe coordinates
+      zoom: 12
+    });
+
+    // Add markers for service providers
+    serviceProviders.forEach((provider) => {
+      const markerEl = document.createElement('div');
+      markerEl.className = 'custom-marker';
+      markerEl.innerHTML = `<div class="w-12 h-12 rounded-full bg-primary/10 backdrop-blur-sm p-2 cursor-pointer hover:scale-110 transition-transform">
+        <img src="${provider.image}" class="w-full h-full object-cover rounded-full" />
+      </div>`;
+      
+      markerEl.addEventListener('click', () => {
+        setSelectedProvider(provider);
+      });
+
+      new mapboxgl.Marker(markerEl)
+        .setLngLat(provider.location)
+        .addTo(map.current);
+    });
+
+    return () => {
+      map.current?.remove();
+    };
+  }, []);
+
+  const handleProviderSelect = (provider: ServiceProvider) => {
+    setSelectedProvider(provider);
+  };
+
+  const handleBookNow = () => {
+    if (!selectedCar || !selectedService || !selectedDateTime) {
+      toast({
+        title: "Missing information",
+        description: "Please select all required booking details",
+        variant: "destructive",
+      });
+      return;
+    }
+    navigate("/booking-details");
+  };
+
   return (
     <div className="relative h-screen w-full bg-[#1A1F2C]">
       {/* Map Container */}
       <div className="absolute inset-0 bg-[#1A1F2C]">
-        {/* Map placeholder - dark themed */}
-        <div className="h-full w-full bg-[#1A1F2C] opacity-80">
-          {/* Map with glowing point at Chillicothe */}
-          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-            <div className="w-3 h-3 rounded-full bg-primary animate-pulse" />
-            <div className="absolute inset-0 bg-primary/30 rounded-full blur-lg animate-pulse" />
+        <div ref={mapContainer} className="h-full w-full" />
+      </div>
+
+      {/* Provider Info Card */}
+      {selectedProvider && (
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[#232836]/95 backdrop-blur-sm p-4 rounded-lg shadow-lg w-80">
+          <div className="flex items-start gap-4">
+            <img 
+              src={selectedProvider.image} 
+              alt={selectedProvider.name}
+              className="w-16 h-16 rounded-full object-cover"
+            />
+            <div className="flex-1">
+              <div className="flex items-center justify-between">
+                <h3 className="text-white font-semibold">{selectedProvider.name}</h3>
+                <span className="bg-primary/20 text-primary px-2 py-1 rounded text-sm">
+                  {selectedProvider.rating} ★
+                </span>
+              </div>
+              <p className="text-gray-400 text-sm mt-1">{selectedProvider.address}</p>
+              <div className="flex items-center justify-between mt-2">
+                <div className="flex items-center gap-2 text-gray-400 text-sm">
+                  <Navigation2 className="w-4 h-4" />
+                  {selectedProvider.distance}
+                </div>
+                <div className="flex items-center gap-2 text-gray-400 text-sm">
+                  ${selectedProvider.cost}
+                </div>
+              </div>
+              <button 
+                onClick={handleBookNow}
+                className="w-full mt-3 bg-gradient-to-r from-primary to-primary/80 text-secondary font-medium py-2 rounded-lg hover:opacity-90 transition-opacity"
+              >
+                Book Now
+              </button>
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Bottom Action Panel */}
       <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-[#1A1F2C] via-[#1A1F2C]/80 to-transparent pt-20">
