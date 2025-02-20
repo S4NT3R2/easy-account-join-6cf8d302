@@ -5,8 +5,6 @@ import { useState, useEffect, useRef } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 
-const MAPBOX_TOKEN = "YOUR_MAPBOX_TOKEN"; // Replace with your Mapbox token
-
 const addressTypes = [
   { id: "home", label: "Home", icon: "🏠" },
   { id: "office", label: "Office", icon: "🏢" },
@@ -19,25 +17,59 @@ const AddLocationPage = () => {
   const [selectedType, setSelectedType] = useState("home");
   const [address, setAddress] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
+  const [mapboxToken, setMapboxToken] = useState("");
+  const [isMapInitialized, setIsMapInitialized] = useState(false);
 
   useEffect(() => {
-    if (!mapContainer.current) return;
+    if (!mapContainer.current || !mapboxToken || isMapInitialized) return;
 
-    mapboxgl.accessToken = MAPBOX_TOKEN;
-    map.current = new mapboxgl.Map({
-      container: mapContainer.current,
-      style: "mapbox://styles/mapbox/dark-v11",
-      center: [-92.5, 39.7], // Centered on Missouri (approximately)
-      zoom: 7,
-    });
+    try {
+      mapboxgl.accessToken = mapboxToken;
+      map.current = new mapboxgl.Map({
+        container: mapContainer.current,
+        style: "mapbox://styles/mapbox/dark-v11",
+        center: [-92.5, 39.7], // Centered on Missouri (approximately)
+        zoom: 7,
+      });
 
-    // Add navigation controls
-    map.current.addControl(new mapboxgl.NavigationControl(), "bottom-right");
+      // Add navigation controls
+      map.current.addControl(new mapboxgl.NavigationControl(), "bottom-right");
+      
+      setIsMapInitialized(true);
+    } catch (error) {
+      console.error("Error initializing map:", error);
+    }
 
     return () => {
-      map.current?.remove();
+      if (map.current) {
+        map.current.remove();
+        setIsMapInitialized(false);
+      }
     };
-  }, []);
+  }, [mapboxToken, isMapInitialized]);
+
+  if (!mapboxToken) {
+    return (
+      <div className="min-h-screen bg-[#1A1F2C] p-4 flex flex-col items-center justify-center">
+        <div className="max-w-md w-full space-y-4">
+          <h2 className="text-xl text-white text-center mb-4">Enter Mapbox Token</h2>
+          <p className="text-sm text-gray-400 text-center mb-6">
+            To use the map feature, please enter your Mapbox public token. You can find this in your Mapbox account dashboard.
+          </p>
+          <input
+            type="text"
+            value={mapboxToken}
+            onChange={(e) => setMapboxToken(e.target.value)}
+            placeholder="Enter your Mapbox public token"
+            className="w-full p-4 rounded-xl bg-[#232836] text-white border border-gray-700/50 focus:border-primary transition-colors text-sm"
+          />
+          <p className="text-xs text-gray-500 text-center">
+            Visit <a href="https://mapbox.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">mapbox.com</a> to get your token
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#1A1F2C]">
