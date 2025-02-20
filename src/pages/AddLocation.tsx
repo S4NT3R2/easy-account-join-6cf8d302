@@ -42,7 +42,7 @@ const AddLocationPage = () => {
   return (
     <div className="min-h-screen bg-[#1A1F2C]">
       {/* Map Container */}
-      <div className="relative h-[60vh]">
+      <div className="relative h-[55vh]">
         <div ref={mapContainer} className="absolute inset-0" />
         
         {/* Header */}
@@ -52,9 +52,9 @@ const AddLocationPage = () => {
             className="text-white hover:text-primary/80 flex items-center gap-2"
           >
             <ArrowLeft className="w-6 h-6" />
-            <span>Cancel</span>
+            <span className="text-sm">Cancel</span>
           </Link>
-          <button className="text-primary hover:text-primary/80">
+          <button className="text-primary hover:text-primary/80 text-sm">
             Continue
           </button>
         </div>
@@ -68,7 +68,7 @@ const AddLocationPage = () => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search Location"
-              className="w-full pl-12 pr-4 py-3 rounded-lg bg-[#232836] text-white border border-gray-700 focus:border-primary transition-colors"
+              className="w-full pl-12 pr-12 py-3.5 rounded-xl bg-[#232836] text-white border border-gray-700/50 focus:border-primary transition-colors text-sm"
             />
             <button className="absolute right-4 top-1/2 -translate-y-1/2">
               <MapPin className="w-5 h-5 text-primary" />
@@ -78,12 +78,12 @@ const AddLocationPage = () => {
       </div>
 
       {/* Bottom Sheet */}
-      <div className="relative -mt-6 rounded-t-[2rem] bg-[#1A1F2C] p-6 z-20">
+      <div className="relative -mt-8 rounded-t-[2rem] bg-[#1A1F2C] p-6 z-20 shadow-xl border-t border-gray-800">
         <div className="space-y-6">
           {/* Address Type Selection */}
           <div>
             <h3 className="text-sm text-gray-400 mb-3">Select Address type</h3>
-            <div className="flex gap-4">
+            <div className="flex gap-3">
               {addressTypes.map((type) => (
                 <button
                   key={type.id}
@@ -91,7 +91,7 @@ const AddLocationPage = () => {
                   className={`flex-1 p-4 rounded-xl flex flex-col items-center gap-2 border transition-all ${
                     selectedType === type.id
                       ? "border-primary bg-primary/10"
-                      : "border-gray-700 hover:border-primary/50"
+                      : "border-gray-700/50 hover:border-primary/50"
                   }`}
                 >
                   <span className="text-2xl">{type.icon}</span>
@@ -108,12 +108,12 @@ const AddLocationPage = () => {
               value={address}
               onChange={(e) => setAddress(e.target.value)}
               placeholder="Enter complete address"
-              className="w-full p-4 rounded-lg bg-[#232836] text-white border border-gray-700 focus:border-primary transition-colors min-h-[100px] resize-none"
+              className="w-full p-4 rounded-xl bg-[#232836] text-white border border-gray-700/50 focus:border-primary transition-colors min-h-[100px] resize-none text-sm"
             />
           </div>
 
           {/* Save Button */}
-          <button className="w-full p-4 rounded-lg bg-gradient-to-r from-[#1eefac] to-[#1EAEDB] text-white font-medium hover:opacity-90 transition-opacity">
+          <button className="w-full p-4 rounded-xl bg-gradient-to-r from-[#1eefac] to-[#1EAEDB] text-white font-medium hover:opacity-90 transition-opacity">
             Save
           </button>
         </div>
