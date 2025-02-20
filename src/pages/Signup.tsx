@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Car, Facebook, ChevronRight } from "lucide-react";
+import { Car, Facebook, ChevronRight, User, Mail, Phone } from "lucide-react";
 import { toast } from "sonner";
 
 const Signup = () => {
@@ -20,61 +20,74 @@ const Signup = () => {
       return;
     }
 
-    // Here you would typically make an API call to create the account
     toast.success("Account created successfully!");
     navigate("/login");
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-[#1A1F2C]">
-      <div className="w-full max-w-md animate-fadeIn">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-[#1A1F2C] bg-grid-white/[0.02]">
+      <div className="w-full max-w-md space-y-8 animate-fade-in">
         {/* Logo Section */}
-        <div className="text-center mb-8">
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center">
-              <Car className="text-background w-6 h-6" />
+        <div className="text-center space-y-4">
+          <div className="flex items-center justify-center">
+            <div className="relative">
+              <div className="w-16 h-16 bg-primary rounded-2xl flex items-center justify-center animate-float">
+                <Car className="text-background w-8 h-8" strokeWidth={1.5} />
+              </div>
+              <div className="absolute inset-0 bg-primary/20 rounded-2xl blur-xl -z-10" />
             </div>
           </div>
-          <h1 className="text-3xl font-bold text-white mb-2">Create Account</h1>
-          <p className="text-muted-foreground">Join CarwashLink today</p>
+          <div className="space-y-2">
+            <h1 className="text-4xl font-bold text-white">Create Account</h1>
+            <p className="text-gray-400">Join CarwashLink today</p>
+          </div>
         </div>
 
-        <div className="bg-card/10 backdrop-blur-lg border border-border/50 rounded-2xl p-8 shadow-xl">
+        <div className="bg-[#232836] backdrop-blur-lg border border-white/5 rounded-2xl p-8 shadow-xl">
           <form className="space-y-6" onSubmit={handleSubmit}>
             <div className="space-y-2">
               <label className="text-sm font-medium text-white">Full Name</label>
-              <input
-                type="text"
-                className="w-full bg-background/50 border border-border/50 rounded-xl p-4 text-white focus:ring-2 focus:ring-primary outline-none transition-all"
-                placeholder="Enter your full name"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                required
-              />
+              <div className="relative">
+                <User className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <input
+                  type="text"
+                  className="w-full bg-[#1A1F2C] border border-white/5 rounded-xl p-4 pl-12 text-white focus:ring-2 focus:ring-primary outline-none transition-all"
+                  placeholder="Enter your full name"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  required
+                />
+              </div>
             </div>
 
             <div className="space-y-2">
               <label className="text-sm font-medium text-white">Email</label>
-              <input
-                type="email"
-                className="w-full bg-background/50 border border-border/50 rounded-xl p-4 text-white focus:ring-2 focus:ring-primary outline-none transition-all"
-                placeholder="Enter your email"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                required
-              />
+              <div className="relative">
+                <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <input
+                  type="email"
+                  className="w-full bg-[#1A1F2C] border border-white/5 rounded-xl p-4 pl-12 text-white focus:ring-2 focus:ring-primary outline-none transition-all"
+                  placeholder="Enter your email"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  required
+                />
+              </div>
             </div>
 
             <div className="space-y-2">
               <label className="text-sm font-medium text-white">Phone Number</label>
-              <input
-                type="tel"
-                className="w-full bg-background/50 border border-border/50 rounded-xl p-4 text-white focus:ring-2 focus:ring-primary outline-none transition-all"
-                placeholder="Enter your phone number"
-                value={formData.phoneNumber}
-                onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
-                required
-              />
+              <div className="relative">
+                <Phone className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <input
+                  type="tel"
+                  className="w-full bg-[#1A1F2C] border border-white/5 rounded-xl p-4 pl-12 text-white focus:ring-2 focus:ring-primary outline-none transition-all"
+                  placeholder="Enter your phone number"
+                  value={formData.phoneNumber}
+                  onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
+                  required
+                />
+              </div>
             </div>
 
             <button 
@@ -85,12 +98,12 @@ const Signup = () => {
               <ChevronRight className="w-4 h-4" />
             </button>
 
-            <div className="relative my-8">
+            <div className="relative my-6">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-border/50"></div>
+                <div className="w-full border-t border-white/5"></div>
               </div>
               <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-[#1A1F2C] px-2 text-muted-foreground">
+                <span className="bg-[#232836] px-2 text-gray-400">
                   Or sign up with
                 </span>
               </div>
@@ -99,14 +112,14 @@ const Signup = () => {
             <div className="grid grid-cols-2 gap-4">
               <button 
                 type="button"
-                className="flex items-center justify-center gap-2 p-4 rounded-xl border border-border/50 hover:bg-card/5 transition-colors"
+                className="flex items-center justify-center gap-2 p-4 rounded-xl border border-white/5 hover:bg-white/5 transition-colors"
               >
                 <Facebook className="w-5 h-5 text-[#1877F2]" />
                 <span className="text-white text-sm">Facebook</span>
               </button>
               <button 
                 type="button"
-                className="flex items-center justify-center gap-2 p-4 rounded-xl border border-border/50 hover:bg-card/5 transition-colors"
+                className="flex items-center justify-center gap-2 p-4 rounded-xl border border-white/5 hover:bg-white/5 transition-colors"
               >
                 <svg className="w-5 h-5" viewBox="0 0 24 24">
                   <path
@@ -131,7 +144,7 @@ const Signup = () => {
             </div>
           </form>
 
-          <p className="text-center text-sm text-muted-foreground mt-8">
+          <p className="text-center text-sm text-gray-400 mt-8">
             Already have an account?{" "}
             <Link
               to="/login"
