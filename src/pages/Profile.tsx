@@ -1,8 +1,7 @@
-
 import { ArrowLeft, Camera, Upload } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useState } from "react";
-import { toast } from "./components/ui/use-toast";
+import { toast } from "@/hooks/use-toast";
 
 const ProfilePage = () => {
   const [uploading, setUploading] = useState(false);
