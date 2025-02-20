@@ -1,5 +1,4 @@
-
-import { Car, Settings, Calendar, MapPin, Search, Phone, Heart, Navigation2 } from "lucide-react";
+import { Car, Settings, Calendar, MapPin, Search, Navigation2 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { SelectCarSheet } from "@/components/SelectCarSheet";
 import { ServicesSheet } from "@/components/ServicesSheet";
@@ -9,7 +8,7 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import { useNavigate } from "react-router-dom";
 import { toast } from "@/hooks/use-toast";
 
-// You'll need to replace this with your actual Mapbox token
+// Initialize mapbox with a temporary token
 mapboxgl.accessToken = 'pk.eyJ1IjoibG92YWJsZSIsImEiOiJjbHNxOXBzZWkwMXUyMnFxbzhtbml4NnRrIn0.JDk3EwlcTF1HenYHiNx9DQ';
 
 interface Service {
@@ -37,37 +36,38 @@ interface ServiceProvider {
   location: [number, number];
 }
 
-const serviceProviders: ServiceProvider[] = [
+// Mock data
+const mockServiceProviders: ServiceProvider[] = [
   {
     id: "1",
-    name: "Quickwash Services",
-    address: "104, Hilton Street, Chillicolate, USA",
-    rating: 4.5,
-    distance: "2.5 km",
-    cost: 60,
+    name: "Premium Car Wash",
+    address: "123 Main Street, New York, USA",
+    rating: 4.8,
+    distance: "0.8 km",
+    cost: 80,
     image: "/lovable-uploads/480bcf4d-f31d-4960-a1f6-2805e938dbe2.png",
-    location: [-93.552, 40.0215],
+    location: [-74.006, 40.7128], // NYC coordinates
   },
   {
     id: "2",
-    name: "Premium Car Wash",
-    address: "220 Main Street, Downtown, USA",
-    rating: 4.8,
+    name: "Deluxe Auto Care",
+    address: "456 Park Avenue, New York, USA",
+    rating: 4.6,
     distance: "1.2 km",
-    cost: 75,
+    cost: 95,
     image: "/lovable-uploads/f5732ae3-9d0b-42e1-afd0-3ad757441eb7.png",
-    location: [-93.562, 40.0225],
+    location: [-73.998, 40.7148], // Slightly offset from first location
   },
   {
     id: "3",
-    name: "Sparkle & Shine",
-    address: "55 Park Avenue, Uptown, USA",
-    rating: 4.3,
-    distance: "3.1 km",
-    cost: 55,
+    name: "Elite Car Services",
+    address: "789 Broadway, New York, USA",
+    rating: 4.9,
+    distance: "1.5 km",
+    cost: 120,
     image: "/lovable-uploads/1775f99c-0d21-45df-be77-82e3edd8658b.png",
-    location: [-93.542, 40.0205],
-  },
+    location: [-74.001, 40.7138], // Another nearby location
+  }
 ];
 
 const HomePage = () => {
@@ -85,6 +85,7 @@ const HomePage = () => {
   const [selectedDateTime, setSelectedDateTime] = useState<Date | null>(null);
   const [mapInitialized, setMapInitialized] = useState(false);
 
+  // Initialize map
   useEffect(() => {
     if (!mapContainer.current || mapInitialized) return;
 
@@ -92,20 +93,27 @@ const HomePage = () => {
       map.current = new mapboxgl.Map({
         container: mapContainer.current,
         style: 'mapbox://styles/mapbox/dark-v11',
-        center: [-93.552, 40.0215],
-        zoom: 12
+        center: [-74.006, 40.7128], // NYC coordinates
+        zoom: 13
       });
 
       map.current.on('load', () => {
+        if (!map.current) return;
         setMapInitialized(true);
         
+        // Clear existing markers
+        markers.current.forEach(marker => marker.remove());
+        markers.current = [];
+        
         // Add markers for service providers
-        serviceProviders.forEach((provider) => {
+        mockServiceProviders.forEach((provider) => {
           const markerEl = document.createElement('div');
           markerEl.className = 'custom-marker';
-          markerEl.innerHTML = `<div class="w-12 h-12 rounded-full bg-primary/10 backdrop-blur-sm p-2 cursor-pointer hover:scale-110 transition-transform">
-            <img src="${provider.image}" class="w-full h-full object-cover rounded-full" />
-          </div>`;
+          markerEl.innerHTML = `
+            <div class="w-12 h-12 rounded-full bg-primary/10 backdrop-blur-sm p-2 cursor-pointer hover:scale-110 transition-transform">
+              <img src="${provider.image}" class="w-full h-full object-cover rounded-full" alt="${provider.name}" />
+            </div>
+          `;
           
           markerEl.addEventListener('click', () => {
             setSelectedProvider(provider);
@@ -113,11 +121,14 @@ const HomePage = () => {
 
           const marker = new mapboxgl.Marker(markerEl)
             .setLngLat(provider.location)
-            .addTo(map.current!);
+            .addTo(map.current);
           
           markers.current.push(marker);
         });
       });
+
+      // Add navigation controls
+      map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
 
       return () => {
         markers.current.forEach(marker => marker.remove());
@@ -130,7 +141,7 @@ const HomePage = () => {
     } catch (error) {
       console.error('Error initializing map:', error);
       toast({
-        title: "Error",
+        title: "Map Error",
         description: "Could not load the map. Please try again later.",
         variant: "destructive",
       });
@@ -139,13 +150,21 @@ const HomePage = () => {
 
   const handleProviderSelect = (provider: ServiceProvider) => {
     setSelectedProvider(provider);
+    
+    if (map.current && provider.location) {
+      map.current.flyTo({
+        center: provider.location,
+        zoom: 14,
+        duration: 1500
+      });
+    }
   };
 
   const handleBookNow = () => {
     if (!selectedCar || !selectedService || !selectedDateTime) {
       toast({
-        title: "Missing information",
-        description: "Please select all required booking details",
+        title: "Missing Information",
+        description: "Please select a car, service, and time before booking.",
         variant: "destructive",
       });
       return;
@@ -257,7 +276,7 @@ const HomePage = () => {
               </div>
               <div className="text-left">
                 <span className="text-sm text-white block">Service Location</span>
-                <span className="text-xs text-gray-400">104, Hilton Street, Chillicolate, USA</span>
+                <span className="text-xs text-gray-400">New York, USA</span>
               </div>
             </div>
             <Search className="w-5 h-5 text-gray-400" />
