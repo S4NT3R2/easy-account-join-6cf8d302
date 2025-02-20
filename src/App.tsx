@@ -14,6 +14,7 @@ import HomePage from "./pages/Home";
 import CarsPage from "./pages/Cars";
 import AddCarPage from "./pages/AddCar";
 import AddressesPage from "./pages/Addresses";
+import AddLocationPage from "./pages/AddLocation";
 import LanguagePage from "./pages/Language";
 
 // Create QueryClient instance outside of component
@@ -54,6 +55,7 @@ const AppContent = () => {
         <Route path="/cars" element={<CarsPage />} />
         <Route path="/cars/add" element={<AddCarPage />} />
         <Route path="/addresses" element={<AddressesPage />} />
+        <Route path="/addresses/add" element={<AddLocationPage />} />
         <Route path="/language" element={<LanguagePage />} />
         <Route path="/profile" element={<Navigate to="/home" replace />} />
         <Route path="/bookings" element={<Navigate to="/home" replace />} />

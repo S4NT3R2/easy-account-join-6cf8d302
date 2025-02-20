@@ -51,10 +51,13 @@ const AddressesPage = () => {
       </div>
 
       {/* Add Address Button */}
-      <button className="fixed bottom-6 left-4 right-4 p-4 rounded-lg bg-gradient-to-r from-[#1eefac] to-[#1EAEDB] text-white font-medium hover:opacity-90 transition-opacity flex items-center justify-center gap-2">
+      <Link
+        to="/addresses/add"
+        className="fixed bottom-6 left-4 right-4 p-4 rounded-lg bg-gradient-to-r from-[#1eefac] to-[#1EAEDB] text-white font-medium hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
+      >
         <Plus className="w-5 h-5" />
         Add New Location
-      </button>
+      </Link>
     </div>
   );
 };
