@@ -1,3 +1,4 @@
+
 import { Car, Settings, Calendar, MapPin, Search, Phone, Heart, Navigation2 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { SelectCarSheet } from "@/components/SelectCarSheet";
@@ -6,11 +7,10 @@ import { DateTimeSheet } from "@/components/DateTimeSheet";
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { useNavigate } from "react-router-dom";
-import { Tab } from "@headlessui/react";
 import { toast } from "@/hooks/use-toast";
 
-// Temporary access token - in production, this should be handled securely
-mapboxgl.accessToken = 'YOUR_MAPBOX_ACCESS_TOKEN';
+// You'll need to replace this with your actual Mapbox token
+mapboxgl.accessToken = 'pk.eyJ1IjoibG92YWJsZSIsImEiOiJjbHNxOXBzZWkwMXUyMnFxbzhtbml4NnRrIn0.JDk3EwlcTF1HenYHiNx9DQ';
 
 interface Service {
   id: string;
@@ -74,6 +74,7 @@ const HomePage = () => {
   const navigate = useNavigate();
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
+  const markers = useRef<mapboxgl.Marker[]>([]);
   const [selectedProvider, setSelectedProvider] = useState<ServiceProvider | null>(null);
   
   const [isSelectCarOpen, setIsSelectCarOpen] = useState(false);
@@ -82,38 +83,59 @@ const HomePage = () => {
   const [selectedCar, setSelectedCar] = useState<Car | null>(null);
   const [selectedService, setSelectedService] = useState<Service | null>(null);
   const [selectedDateTime, setSelectedDateTime] = useState<Date | null>(null);
+  const [mapInitialized, setMapInitialized] = useState(false);
 
   useEffect(() => {
-    if (!mapContainer.current) return;
+    if (!mapContainer.current || mapInitialized) return;
 
-    map.current = new mapboxgl.Map({
-      container: mapContainer.current,
-      style: 'mapbox://styles/mapbox/dark-v11',
-      center: [-93.552, 40.0215], // Chillicothe coordinates
-      zoom: 12
-    });
-
-    // Add markers for service providers
-    serviceProviders.forEach((provider) => {
-      const markerEl = document.createElement('div');
-      markerEl.className = 'custom-marker';
-      markerEl.innerHTML = `<div class="w-12 h-12 rounded-full bg-primary/10 backdrop-blur-sm p-2 cursor-pointer hover:scale-110 transition-transform">
-        <img src="${provider.image}" class="w-full h-full object-cover rounded-full" />
-      </div>`;
-      
-      markerEl.addEventListener('click', () => {
-        setSelectedProvider(provider);
+    try {
+      map.current = new mapboxgl.Map({
+        container: mapContainer.current,
+        style: 'mapbox://styles/mapbox/dark-v11',
+        center: [-93.552, 40.0215],
+        zoom: 12
       });
 
-      new mapboxgl.Marker(markerEl)
-        .setLngLat(provider.location)
-        .addTo(map.current);
-    });
+      map.current.on('load', () => {
+        setMapInitialized(true);
+        
+        // Add markers for service providers
+        serviceProviders.forEach((provider) => {
+          const markerEl = document.createElement('div');
+          markerEl.className = 'custom-marker';
+          markerEl.innerHTML = `<div class="w-12 h-12 rounded-full bg-primary/10 backdrop-blur-sm p-2 cursor-pointer hover:scale-110 transition-transform">
+            <img src="${provider.image}" class="w-full h-full object-cover rounded-full" />
+          </div>`;
+          
+          markerEl.addEventListener('click', () => {
+            setSelectedProvider(provider);
+          });
 
-    return () => {
-      map.current?.remove();
-    };
-  }, []);
+          const marker = new mapboxgl.Marker(markerEl)
+            .setLngLat(provider.location)
+            .addTo(map.current!);
+          
+          markers.current.push(marker);
+        });
+      });
+
+      return () => {
+        markers.current.forEach(marker => marker.remove());
+        markers.current = [];
+        if (map.current) {
+          map.current.remove();
+          map.current = null;
+        }
+      };
+    } catch (error) {
+      console.error('Error initializing map:', error);
+      toast({
+        title: "Error",
+        description: "Could not load the map. Please try again later.",
+        variant: "destructive",
+      });
+    }
+  }, [mapInitialized]);
 
   const handleProviderSelect = (provider: ServiceProvider) => {
     setSelectedProvider(provider);
