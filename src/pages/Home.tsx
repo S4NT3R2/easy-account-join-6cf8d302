@@ -1,4 +1,3 @@
-
 import { Car, Settings, Calendar, MapPin, Search, Phone, Heart, Navigation2 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { SelectCarSheet } from "@/components/SelectCarSheet";
@@ -49,7 +48,26 @@ const serviceProviders: ServiceProvider[] = [
     image: "/lovable-uploads/480bcf4d-f31d-4960-a1f6-2805e938dbe2.png",
     location: [-93.552, 40.0215],
   },
-  // Add more service providers here
+  {
+    id: "2",
+    name: "Premium Car Wash",
+    address: "220 Main Street, Downtown, USA",
+    rating: 4.8,
+    distance: "1.2 km",
+    cost: 75,
+    image: "/lovable-uploads/f5732ae3-9d0b-42e1-afd0-3ad757441eb7.png",
+    location: [-93.562, 40.0225],
+  },
+  {
+    id: "3",
+    name: "Sparkle & Shine",
+    address: "55 Park Avenue, Uptown, USA",
+    rating: 4.3,
+    distance: "3.1 km",
+    cost: 55,
+    image: "/lovable-uploads/1775f99c-0d21-45df-be77-82e3edd8658b.png",
+    location: [-93.542, 40.0205],
+  },
 ];
 
 const HomePage = () => {
