@@ -41,12 +41,12 @@ const mockServiceProviders: ServiceProvider[] = [
   {
     id: "1",
     name: "Premium Car Wash",
-    address: "123 Main Street, New York, USA",
+    address: "104, Hilton Street, Chillicolate, USA",
     rating: 4.8,
     distance: "0.8 km",
     cost: 80,
     image: "/lovable-uploads/480bcf4d-f31d-4960-a1f6-2805e938dbe2.png",
-    location: [-74.006, 40.7128], // NYC coordinates
+    location: [-74.006, 40.7128],
   },
   {
     id: "2",
@@ -56,7 +56,7 @@ const mockServiceProviders: ServiceProvider[] = [
     distance: "1.2 km",
     cost: 95,
     image: "/lovable-uploads/f5732ae3-9d0b-42e1-afd0-3ad757441eb7.png",
-    location: [-73.998, 40.7148], // Slightly offset from first location
+    location: [-73.998, 40.7148],
   },
   {
     id: "3",
@@ -66,7 +66,7 @@ const mockServiceProviders: ServiceProvider[] = [
     distance: "1.5 km",
     cost: 120,
     image: "/lovable-uploads/1775f99c-0d21-45df-be77-82e3edd8658b.png",
-    location: [-74.001, 40.7138], // Another nearby location
+    location: [-74.001, 40.7138],
   }
 ];
 
@@ -85,7 +85,6 @@ const HomePage = () => {
   const [selectedDateTime, setSelectedDateTime] = useState<Date | null>(null);
   const [mapInitialized, setMapInitialized] = useState(false);
 
-  // Initialize map
   useEffect(() => {
     if (!mapContainer.current || mapInitialized) return;
 
@@ -93,7 +92,7 @@ const HomePage = () => {
       map.current = new mapboxgl.Map({
         container: mapContainer.current,
         style: 'mapbox://styles/mapbox/dark-v11',
-        center: [-74.006, 40.7128], // NYC coordinates
+        center: [-74.006, 40.7128],
         zoom: 13
       });
 
@@ -101,11 +100,9 @@ const HomePage = () => {
         if (!map.current) return;
         setMapInitialized(true);
         
-        // Clear existing markers
         markers.current.forEach(marker => marker.remove());
         markers.current = [];
         
-        // Add markers for service providers
         mockServiceProviders.forEach((provider) => {
           const markerEl = document.createElement('div');
           markerEl.className = 'custom-marker';
@@ -127,7 +124,6 @@ const HomePage = () => {
         });
       });
 
-      // Add navigation controls
       map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
 
       return () => {
@@ -174,14 +170,12 @@ const HomePage = () => {
 
   return (
     <div className="relative h-screen w-full bg-[#1A1F2C]">
-      {/* Map Container */}
       <div className="absolute inset-0 bg-[#1A1F2C]">
         <div ref={mapContainer} className="h-full w-full" />
       </div>
 
-      {/* Provider Info Card */}
       {selectedProvider && (
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[#232836]/95 backdrop-blur-sm p-4 rounded-lg shadow-lg w-80">
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[#232836]/95 backdrop-blur-sm p-4 rounded-xl shadow-lg w-80">
           <div className="flex items-start gap-4">
             <img 
               src={selectedProvider.image} 
@@ -207,7 +201,7 @@ const HomePage = () => {
               </div>
               <button 
                 onClick={handleBookNow}
-                className="w-full mt-3 bg-gradient-to-r from-primary to-primary/80 text-secondary font-medium py-2 rounded-lg hover:opacity-90 transition-opacity"
+                className="w-full mt-3 bg-primary text-background font-medium py-2 rounded-xl hover:opacity-90 transition-opacity"
               >
                 Book Now
               </button>
@@ -216,75 +210,55 @@ const HomePage = () => {
         </div>
       )}
 
-      {/* Bottom Action Panel */}
-      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-[#1A1F2C] via-[#1A1F2C]/80 to-transparent pt-20">
-        <div className="glass-morphism mx-4 mb-4 rounded-2xl p-6 space-y-6 bg-[#232836]/90">
-          {/* Action Buttons */}
-          <div className="grid grid-cols-3 gap-4">
+      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-[#1A1F2C] via-[#1A1F2C]/80 to-transparent pt-16">
+        <div className="mx-4 mb-8 space-y-6">
+          <div className="grid grid-cols-3 gap-8">
             <button 
               onClick={() => setIsSelectCarOpen(true)} 
-              className="flex flex-col items-center space-y-2"
+              className="flex flex-col items-center space-y-3"
             >
-              <div className="w-14 h-14 rounded-full bg-[#2A2F3C] flex items-center justify-center">
-                <Car className="w-6 h-6 text-primary" />
+              <div className="w-16 h-16 rounded-full bg-[#232836] flex items-center justify-center">
+                <Car className="w-8 h-8 text-primary" strokeWidth={1.5} />
               </div>
-              <span className="text-sm text-white">Select Car</span>
-              {selectedCar && (
-                <span className="text-xs text-gray-400">{selectedCar.name}</span>
-              )}
+              <span className="text-base text-white font-normal">Select Car</span>
             </button>
             
             <button 
               onClick={() => setIsServicesOpen(true)}
-              className="flex flex-col items-center space-y-2"
+              className="flex flex-col items-center space-y-3"
             >
-              <div className="w-14 h-14 rounded-full bg-[#2A2F3C] flex items-center justify-center">
-                <Settings className="w-6 h-6 text-primary" />
+              <div className="w-16 h-16 rounded-full bg-[#232836] flex items-center justify-center">
+                <Settings className="w-8 h-8 text-primary" strokeWidth={1.5} />
               </div>
-              <span className="text-sm text-white">Services</span>
-              {selectedService && (
-                <span className="text-xs text-gray-400">{selectedService.name}</span>
-              )}
+              <span className="text-base text-white font-normal">Services</span>
             </button>
             
             <button 
               onClick={() => setIsDateTimeOpen(true)}
-              className="flex flex-col items-center space-y-2"
+              className="flex flex-col items-center space-y-3"
             >
-              <div className="w-14 h-14 rounded-full bg-[#2A2F3C] flex items-center justify-center">
-                <Calendar className="w-6 h-6 text-primary" />
+              <div className="w-16 h-16 rounded-full bg-[#232836] flex items-center justify-center">
+                <Calendar className="w-8 h-8 text-primary" strokeWidth={1.5} />
               </div>
-              <span className="text-sm text-white">When?</span>
-              {selectedDateTime && (
-                <span className="text-xs text-gray-400">
-                  {selectedDateTime.toLocaleDateString('en-US', {
-                    month: 'short',
-                    day: 'numeric',
-                    hour: 'numeric',
-                    minute: 'numeric',
-                  })}
-                </span>
-              )}
+              <span className="text-base text-white font-normal">When?</span>
             </button>
           </div>
 
-          {/* Location Search */}
-          <button className="w-full flex items-center gap-3 p-4 rounded-xl bg-[#2A2F3C] hover:bg-[#2F3447] transition-colors">
-            <div className="flex items-center gap-3 flex-1">
-              <div className="w-12 h-12 rounded-full bg-[#232836] flex items-center justify-center">
-                <MapPin className="w-5 h-5 text-primary" />
+          <div className="bg-[#232836] rounded-2xl p-4">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-full bg-[#1A1F2C] flex items-center justify-center">
+                <MapPin className="w-6 h-6 text-primary" strokeWidth={1.5} />
               </div>
-              <div className="text-left">
-                <span className="text-sm text-white block">Service Location</span>
-                <span className="text-xs text-gray-400">New York, USA</span>
+              <div className="flex-1">
+                <h3 className="text-white text-lg font-medium mb-1">Service Location</h3>
+                <p className="text-gray-400">104, Hilton Street, Chillicolate, USA</p>
               </div>
+              <Search className="w-6 h-6 text-gray-400" strokeWidth={1.5} />
             </div>
-            <Search className="w-5 h-5 text-gray-400" />
-          </button>
+          </div>
         </div>
       </div>
 
-      {/* Bottom Sheets */}
       <SelectCarSheet
         open={isSelectCarOpen}
         onOpenChange={setIsSelectCarOpen}
