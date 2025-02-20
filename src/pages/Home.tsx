@@ -9,6 +9,7 @@ interface Service {
   id: string;
   name: string;
   price: number;
+  icon: React.ReactNode;
 }
 
 interface Car {

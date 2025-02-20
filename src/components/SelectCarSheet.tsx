@@ -22,13 +22,13 @@ const cars: Car[] = [
     id: "1",
     name: "Vanquish S Aston Martine",
     plateNumber: "FYD 6778",
-    image: "/lovable-uploads/9a030240-7a51-49e2-8295-cdf1ca33a28d.png",
+    image: "/lovable-uploads/797bf7f3-5624-4894-80ae-3056c954c808.png",
   },
   {
     id: "2",
     name: "BMW M4",
     plateNumber: "MYS 5521",
-    image: "/lovable-uploads/9c086826-9d2f-481c-818b-1f3d53deb170.png",
+    image: "/lovable-uploads/abb66627-cad4-4c4f-8531-2210017f4336.png",
   },
 ];
 
