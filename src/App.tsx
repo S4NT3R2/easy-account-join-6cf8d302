@@ -6,7 +6,6 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
-import Home from "./pages/Home";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -19,17 +18,17 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={<Navigate to="/home" replace />} />
+            <Route path="/" element={<Navigate to="/login" replace />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
-            <Route path="/home" element={<Home />} />
-            <Route path="/profile" element={<Home />} /> {/* Temporary redirect to Home */}
-            <Route path="/bookings" element={<Home />} /> {/* Temporary redirect to Home */}
-            <Route path="/cars" element={<Home />} /> {/* Temporary redirect to Home */}
-            <Route path="/addresses" element={<Home />} /> {/* Temporary redirect to Home */}
-            <Route path="/favorites" element={<Home />} /> {/* Temporary redirect to Home */}
-            <Route path="/language" element={<Home />} /> {/* Temporary redirect to Home */}
-            <Route path="/contact" element={<Home />} /> {/* Temporary redirect to Home */}
+            <Route path="/home" element={<Navigate to="/login" replace />} />
+            <Route path="/profile" element={<Navigate to="/login" replace />} />
+            <Route path="/bookings" element={<Navigate to="/login" replace />} />
+            <Route path="/cars" element={<Navigate to="/login" replace />} />
+            <Route path="/addresses" element={<Navigate to="/login" replace />} />
+            <Route path="/favorites" element={<Navigate to="/login" replace />} />
+            <Route path="/language" element={<Navigate to="/login" replace />} />
+            <Route path="/contact" element={<Navigate to="/login" replace />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
