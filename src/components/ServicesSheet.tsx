@@ -55,14 +55,14 @@ export function ServicesSheet({ open, onOpenChange, selectedService, onSelectSer
             <button
               key={service.id}
               onClick={() => onSelectService(service)}
-              className={`flex flex-col items-center gap-2 p-6 rounded-lg transition-all ${
+              className={`flex flex-col items-center gap-2 p-6 rounded-lg transition-all hover:scale-105 ${
                 selectedService?.id === service.id
                   ? "bg-primary/10 border-primary"
-                  : "bg-muted/30 border-border"
-              } border`}
+                  : "bg-muted/30 border-border hover:border-primary"
+              } border relative overflow-hidden`}
             >
               <div
-                className={`w-12 h-12 rounded-full flex items-center justify-center ${
+                className={`w-12 h-12 rounded-full flex items-center justify-center float-animation ${
                   selectedService?.id === service.id ? "bg-primary" : "bg-muted/30"
                 }`}
               >
@@ -72,6 +72,7 @@ export function ServicesSheet({ open, onOpenChange, selectedService, onSelectSer
               <div className="text-xs text-muted-foreground">
                 Approx ${service.price}
               </div>
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
             </button>
           ))}
         </div>

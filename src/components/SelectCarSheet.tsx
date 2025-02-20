@@ -44,11 +44,11 @@ export function SelectCarSheet({ open, onOpenChange, selectedCar, onSelectCar }:
             <button
               key={car.id}
               onClick={() => onSelectCar(car)}
-              className={`w-full flex items-center gap-4 p-4 rounded-lg transition-all ${
+              className={`w-full flex items-center gap-4 p-4 rounded-lg transition-all hover:scale-[1.02] ${
                 selectedCar?.id === car.id
                   ? "bg-primary/10 border-primary"
-                  : "bg-muted/30 border-border"
-              } border`}
+                  : "bg-muted/30 border-border hover:border-primary"
+              } border relative overflow-hidden group`}
             >
               <img src={car.image} alt={car.name} className="w-12 h-12 rounded-full object-cover" />
               <div className="flex-1 text-left">
@@ -56,19 +56,20 @@ export function SelectCarSheet({ open, onOpenChange, selectedCar, onSelectCar }:
                 <div className="text-xs text-muted-foreground">{car.plateNumber}</div>
               </div>
               <div
-                className={`w-6 h-6 rounded-full border-2 ${
+                className={`w-6 h-6 rounded-full border-2 transition-all duration-300 ${
                   selectedCar?.id === car.id
-                    ? "border-primary bg-primary"
+                    ? "border-primary bg-primary scale-110"
                     : "border-border"
                 } flex items-center justify-center`}
               >
                 {selectedCar?.id === car.id && (
-                  <div className="w-3 h-3 rounded-full bg-white" />
+                  <div className="w-3 h-3 rounded-full bg-white animate-fadeIn" />
                 )}
               </div>
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
             </button>
           ))}
-          <button className="w-full flex items-center gap-4 p-4 rounded-lg bg-muted/30 border border-border hover:border-primary transition-all">
+          <button className="w-full flex items-center gap-4 p-4 rounded-lg bg-muted/30 border border-border hover:border-primary transition-all hover:scale-[1.02] group relative overflow-hidden">
             <div className="w-12 h-12 rounded-full bg-muted/30 flex items-center justify-center">
               <Plus className="w-6 h-6 text-primary" />
             </div>
@@ -76,6 +77,7 @@ export function SelectCarSheet({ open, onOpenChange, selectedCar, onSelectCar }:
               <div className="text-sm font-medium text-white">Add a new car</div>
               <div className="text-xs text-muted-foreground">Tap to add</div>
             </div>
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
           </button>
         </div>
       </SheetContent>
