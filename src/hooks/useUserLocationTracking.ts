@@ -1,10 +1,10 @@
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import mapboxgl from 'mapbox-gl';
 
 interface UseUserLocationTrackingProps {
   map: React.RefObject<mapboxgl.Map | null>;
-  userMarker: React.RefObject<mapboxgl.Marker | null>;
+  userMarker: React.MutableRefObject<mapboxgl.Marker | null>;
   userLocation: [number, number] | null;
 }
 

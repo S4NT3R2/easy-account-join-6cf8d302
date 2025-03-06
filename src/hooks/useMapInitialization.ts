@@ -15,7 +15,7 @@ interface UseMapInitializationProps {
 interface UseMapInitializationResult {
   mapContainer: React.RefObject<HTMLDivElement>;
   map: React.RefObject<mapboxgl.Map | null>;
-  userMarker: React.RefObject<mapboxgl.Marker | null>;
+  userMarker: React.MutableRefObject<mapboxgl.Marker | null>;
   markers: React.MutableRefObject<mapboxgl.Marker[]>;
   mapInitialized: boolean;
   getUserLocation: () => Promise<void>;

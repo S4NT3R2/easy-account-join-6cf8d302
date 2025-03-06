@@ -6,7 +6,7 @@ import mapboxgl from 'mapbox-gl';
 
 interface UseLocationWatcherProps {
   map: React.RefObject<mapboxgl.Map | null>;
-  userMarker: React.RefObject<mapboxgl.Marker | null>;
+  userMarker: React.MutableRefObject<mapboxgl.Marker | null>;
   mapInitialized: boolean;
   setUserLocation: (location: [number, number] | null) => void;
   setLocationError: (error: string | null) => void;
@@ -23,6 +23,7 @@ export const useLocationWatcher = ({
   setUserLocation,
   setLocationError
 }: UseLocationWatcherProps): UseLocationWatcherResult => {
+  // Change from useRef<number | null>(null) to useRef<number | null>(null) as MutableRefObject
   const watchId = useRef<number | null>(null);
   const isManualLocationRequest = useRef<boolean>(false);
 
