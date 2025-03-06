@@ -16,12 +16,19 @@ export const createUserMarker = (
   const userEl = document.createElement('div');
   userEl.className = 'user-location-marker';
   userEl.innerHTML = `
-    <div class="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center pulse-animation">
-      <div class="w-4 h-4 rounded-full bg-white"></div>
+    <div class="relative">
+      <div class="w-8 h-8 rounded-full bg-blue-500/20 absolute animate-ping"></div>
+      <div class="w-8 h-8 rounded-full bg-blue-500/40 flex items-center justify-center z-10 relative">
+        <div class="w-4 h-4 rounded-full bg-white"></div>
+      </div>
     </div>
   `;
 
-  return new mapboxgl.Marker(userEl)
+  return new mapboxgl.Marker({
+    element: userEl,
+    anchor: 'center',
+    offset: [0, 0]
+  })
     .setLngLat(lngLat)
     .addTo(map);
 };
@@ -53,18 +60,21 @@ export const addMapStyles = (): HTMLStyleElement => {
   style.textContent = `
     @keyframes pulse {
       0% {
-        box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7);
+        opacity: 0.6;
+        transform: scale(0.8);
       }
-      70% {
-        box-shadow: 0 0 0 10px rgba(59, 130, 246, 0);
+      50% {
+        opacity: 0.3;
+        transform: scale(1.2);
       }
       100% {
-        box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+        opacity: 0.6;
+        transform: scale(0.8);
       }
     }
     
-    .pulse-animation {
-      animation: pulse 2s infinite;
+    .animate-ping {
+      animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
     }
   `;
   document.head.appendChild(style);

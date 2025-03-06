@@ -1,4 +1,3 @@
-
 import { useRef, useState, useEffect } from 'react';
 import mapboxgl from 'mapbox-gl';
 import { toast } from 'sonner';
@@ -40,8 +39,8 @@ export const useMapInitialization = ({
   const [mapInitialized, setMapInitialized] = useState(false);
   const [mapboxToken, setMapboxToken] = useState<string | undefined>(initialToken);
   const [isTokenRequired, setIsTokenRequired] = useState(false);
+  const isManualLocationRequest = useRef<boolean>(false);
 
-  // Clear existing map if any
   const clearExistingMap = () => {
     if (map.current) {
       map.current.remove();
@@ -55,7 +54,6 @@ export const useMapInitialization = ({
     markers.current.forEach(marker => marker.remove());
     markers.current = [];
     
-    // Remove watch position
     if (watchId.current !== null) {
       clearWatch(watchId.current);
       watchId.current = null;
@@ -64,7 +62,6 @@ export const useMapInitialization = ({
     setMapInitialized(false);
   };
 
-  // Set Mapbox access token
   useEffect(() => {
     const savedToken = localStorage.getItem('mapbox_token');
     if (savedToken) {
@@ -78,7 +75,6 @@ export const useMapInitialization = ({
       return;
     }
     
-    // Check if token is valid
     const validateToken = async () => {
       try {
         const response = await fetch(
@@ -101,9 +97,9 @@ export const useMapInitialization = ({
     validateToken();
   }, [mapboxToken]);
 
-  // Function to get user's current location
   const getUserLocation = async () => {
     if (!map.current) return;
+    isManualLocationRequest.current = true;
     
     const { coords, error } = await getCurrentLocation();
     setUserLocation(coords);
@@ -112,56 +108,56 @@ export const useMapInitialization = ({
     if (map.current) {
       map.current.flyTo({
         center: coords,
-        zoom: 13,
+        zoom: 14,
         duration: 1500
       });
       
-      // Update or create user marker
       if (userMarker.current) {
         userMarker.current.setLngLat(coords);
       } else if (map.current) {
         userMarker.current = createUserMarker(coords, map.current);
       }
     }
+    
+    setTimeout(() => {
+      isManualLocationRequest.current = false;
+    }, 2000);
   };
 
-  // Initialize map
   useEffect(() => {
     if (!mapContainer.current || mapInitialized || !mapboxgl.accessToken || isTokenRequired) return;
     
-    // Clear any existing map first
     clearExistingMap();
     
     try {
-      // First try to get user location
       getCurrentLocation().then(({ coords, error }) => {
         setUserLocation(coords);
         setLocationError(error);
         
-        // Initialize map with user location or default location
-        const initialLocation = coords || [31.0335, -17.8292]; // Default to Harare, Zimbabwe
+        const initialLocation = coords || [31.0335, -17.8292];
         
         map.current = new mapboxgl.Map({
           container: mapContainer.current!,
           style: 'mapbox://styles/mapbox/dark-v11',
           center: initialLocation,
-          zoom: 13
+          zoom: 13,
+          dragRotate: false,
+          pitchWithRotate: false,
+          trackResize: true,
+          renderWorldCopies: true
         });
 
         map.current.on('load', () => {
           if (!map.current) return;
           setMapInitialized(true);
           
-          // Add map controls
           addMapControls({ map: map.current });
           
-          // Create user marker if we have a location
           if (coords) {
             userMarker.current = createUserMarker(coords, map.current);
           }
         });
 
-        // Set up real-time location updates
         watchId.current = watchPosition(
           (position) => {
             setUserLocation(position);
@@ -170,6 +166,14 @@ export const useMapInitialization = ({
               userMarker.current.setLngLat(position);
             } else if (map.current) {
               userMarker.current = createUserMarker(position, map.current);
+            }
+            
+            if (isManualLocationRequest.current && map.current) {
+              map.current.flyTo({
+                center: position,
+                zoom: 14,
+                duration: 1000
+              });
             }
           },
           (error) => {

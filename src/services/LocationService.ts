@@ -73,8 +73,8 @@ export const watchPosition = (
     },
     { 
       enableHighAccuracy: true,
-      maximumAge: 0,
-      timeout: 5000
+      maximumAge: 10000, // Accept positions that are up to 10 seconds old
+      timeout: 8000
     }
   );
 };
