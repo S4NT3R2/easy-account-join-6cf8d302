@@ -6,7 +6,7 @@ import { createProviderMarker } from '@/components/map/MapMarker';
 
 interface UseProviderMarkersProps {
   map: React.RefObject<mapboxgl.Map | null>;
-  markers: React.RefObject<mapboxgl.Marker[]>;
+  markers: React.MutableRefObject<mapboxgl.Marker[]>;
   serviceProviders: ServiceProvider[];
   mapInitialized: boolean;
   setSelectedProvider: (provider: ServiceProvider | null) => void;
