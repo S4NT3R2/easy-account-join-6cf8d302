@@ -1,14 +1,10 @@
 
-import { useRef, useEffect, useState } from "react";
-import mapboxgl from 'mapbox-gl';
-import 'mapbox-gl/dist/mapbox-gl.css';
+import React from "react";
 import { ServiceProvider } from "@/types/service.types";
-import { getCurrentLocation, watchPosition, clearWatch } from "@/services/LocationService";
-import { createUserMarker, createProviderMarker, addMapStyles } from "./MapMarker";
-import { addMapControls } from "./MapControls";
-
-// Initialize mapbox with a temporary token
-mapboxgl.accessToken = 'pk.eyJ1IjoibG92YWJsZSIsImEiOiJjbHNxOXBzZWkwMXUyMnFxbzhtbml4NnRrIn0.JDk3EwlcTF1HenYHiNx9DQ';
+import { useMapInitialization } from "@/hooks/useMapInitialization";
+import { useProviderMarkers } from "@/hooks/useProviderMarkers";
+import { useUserLocationTracking } from "@/hooks/useUserLocationTracking";
+import { useMapStyles } from "@/hooks/useMapStyles";
 
 interface MapComponentProps {
   userLocation: [number, number] | null;
@@ -27,154 +23,38 @@ const MapComponent = ({
   serviceProviders,
   setLocationError
 }: MapComponentProps) => {
-  const mapContainer = useRef<HTMLDivElement>(null);
-  const map = useRef<mapboxgl.Map | null>(null);
-  const markers = useRef<mapboxgl.Marker[]>([]);
-  const userMarker = useRef<mapboxgl.Marker | null>(null);
-  const styleElement = useRef<HTMLStyleElement | null>(null);
-  const watchId = useRef<number | null>(null);
-  const [mapInitialized, setMapInitialized] = useState(false);
+  // Use custom hooks for different functionality
+  const {
+    mapContainer,
+    map,
+    userMarker,
+    markers,
+    mapInitialized,
+    getUserLocation
+  } = useMapInitialization({
+    userLocation,
+    setUserLocation,
+    setLocationError
+  });
 
-  // Function to get user's current location
-  const getUserLocation = async () => {
-    const { coords, error } = await getCurrentLocation();
-    setUserLocation(coords);
-    setLocationError(error);
+  // Hook for managing provider markers
+  useProviderMarkers({
+    map,
+    markers,
+    serviceProviders,
+    mapInitialized,
+    setSelectedProvider
+  });
 
-    if (map.current) {
-      map.current.flyTo({
-        center: coords,
-        zoom: 13,
-        duration: 1500
-      });
-      
-      // Update or create user marker
-      if (userMarker.current) {
-        userMarker.current.setLngLat(coords);
-      } else if (map.current) {
-        userMarker.current = createUserMarker(coords, map.current);
-      }
-    }
-  };
+  // Hook for tracking user location
+  useUserLocationTracking({
+    map,
+    userMarker,
+    userLocation
+  });
 
-  // Update service provider markers
-  const updateServiceProviderMarkers = () => {
-    if (!map.current) return;
-    
-    // Clear existing markers
-    markers.current.forEach(marker => marker.remove());
-    markers.current = [];
-    
-    // Add new markers for service providers
-    serviceProviders.forEach((provider) => {
-      const marker = createProviderMarker(
-        provider, 
-        map.current!, 
-        setSelectedProvider
-      );
-      markers.current.push(marker);
-    });
-  };
-
-  // Initialize map
-  useEffect(() => {
-    if (!mapContainer.current || mapInitialized) return;
-    
-    try {
-      // First try to get user location
-      getUserLocation();
-      
-      // Initialize map with default location (will be updated when user location is available)
-      const defaultLocation: [number, number] = [31.0335, -17.8292]; // Harare, Zimbabwe
-      
-      map.current = new mapboxgl.Map({
-        container: mapContainer.current,
-        style: 'mapbox://styles/mapbox/dark-v11',
-        center: userLocation || defaultLocation,
-        zoom: 13
-      });
-
-      map.current.on('load', () => {
-        if (!map.current) return;
-        setMapInitialized(true);
-        
-        // Add service provider markers
-        updateServiceProviderMarkers();
-        
-        // If user location is available, add user marker
-        if (userLocation && map.current) {
-          userMarker.current = createUserMarker(userLocation, map.current);
-        }
-
-        // Add map controls
-        addMapControls({ map: map.current });
-      });
-
-      // Add CSS for the pulse animation
-      styleElement.current = addMapStyles();
-
-      // Set up real-time location updates
-      watchId.current = watchPosition(
-        (position) => {
-          setUserLocation(position);
-          
-          if (userMarker.current) {
-            userMarker.current.setLngLat(position);
-          }
-        },
-        (error) => {
-          console.error('Error watching position:', error);
-          setLocationError(error);
-        }
-      );
-
-      return () => {
-        // Clean up
-        if (map.current) {
-          map.current.remove();
-          map.current = null;
-        }
-        
-        if (userMarker.current) {
-          userMarker.current = null;
-        }
-        
-        markers.current.forEach(marker => marker.remove());
-        markers.current = [];
-        
-        // Remove watch position
-        if (watchId.current !== null) {
-          clearWatch(watchId.current);
-        }
-        
-        // Remove style element
-        if (styleElement.current) {
-          document.head.removeChild(styleElement.current);
-        }
-      };
-    } catch (error) {
-      console.error('Error initializing map:', error);
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      setLocationError(`Could not load the map: ${errorMessage}`);
-    }
-  }, [mapInitialized, userLocation]);
-
-  // Update map when user location changes
-  useEffect(() => {
-    if (map.current && userLocation) {
-      // Update user marker position
-      if (userMarker.current) {
-        userMarker.current.setLngLat(userLocation);
-      }
-    }
-  }, [userLocation]);
-
-  // Update markers when service providers change
-  useEffect(() => {
-    if (mapInitialized) {
-      updateServiceProviderMarkers();
-    }
-  }, [serviceProviders, mapInitialized]);
+  // Hook for map styles
+  useMapStyles();
 
   return (
     <div ref={mapContainer} className="h-full w-full" />
