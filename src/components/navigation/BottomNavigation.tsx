@@ -6,6 +6,7 @@ interface BottomNavigationProps {
   onSelectCarClick: () => void;
   onServicesClick: () => void;
   onDateTimeClick: () => void;
+  onSearchClick: () => void;
   userLocation: [number, number] | null;
 }
 
@@ -13,6 +14,7 @@ const BottomNavigation: React.FC<BottomNavigationProps> = ({
   onSelectCarClick,
   onServicesClick,
   onDateTimeClick,
+  onSearchClick,
   userLocation
 }) => {
   return (
@@ -51,7 +53,10 @@ const BottomNavigation: React.FC<BottomNavigationProps> = ({
         </div>
 
         <div className="bg-[#232836] rounded-2xl p-4">
-          <div className="flex items-center gap-4">
+          <button 
+            onClick={onSearchClick}
+            className="flex items-center gap-4 w-full"
+          >
             <div className="w-12 h-12 rounded-full bg-[#1A1F2C] flex items-center justify-center">
               <MapPin className="w-6 h-6 text-primary" strokeWidth={1.5} />
             </div>
@@ -62,7 +67,7 @@ const BottomNavigation: React.FC<BottomNavigationProps> = ({
               </p>
             </div>
             <Search className="w-6 h-6 text-gray-400" strokeWidth={1.5} />
-          </div>
+          </button>
         </div>
       </div>
     </div>

@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -18,6 +19,7 @@ const HomePage = () => {
   const [isSelectCarOpen, setIsSelectCarOpen] = useState(false);
   const [isServicesOpen, setIsServicesOpen] = useState(false);
   const [isDateTimeOpen, setIsDateTimeOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [selectedCar, setSelectedCar] = useState<Car | null>(null);
   const [selectedService, setSelectedService] = useState<Service | null>(null);
   const [selectedDateTime, setSelectedDateTime] = useState<Date | null>(null);
@@ -32,7 +34,7 @@ const HomePage = () => {
     navigate("/booking-details");
   };
 
-  const getUserLocation = () => {
+  const getUserLocation = async () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -69,6 +71,8 @@ const HomePage = () => {
           setSelectedProvider={setSelectedProvider}
           serviceProviders={mockServiceProviders}
           setLocationError={setLocationError}
+          isSearchOpen={isSearchOpen}
+          onCloseSearch={() => setIsSearchOpen(false)}
         />
       </div>
 
@@ -86,6 +90,7 @@ const HomePage = () => {
         onSelectCarClick={() => setIsSelectCarOpen(true)}
         onServicesClick={() => setIsServicesOpen(true)}
         onDateTimeClick={() => setIsDateTimeOpen(true)}
+        onSearchClick={() => setIsSearchOpen(true)}
         userLocation={userLocation}
       />
 

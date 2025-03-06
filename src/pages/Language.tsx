@@ -8,6 +8,7 @@ const languages = [
   { code: "ar", name: "Arabic" },
   { code: "fr", name: "French" },
   { code: "pt", name: "Portuguese" },
+  { code: "sn", name: "Shona" },
 ];
 
 const LanguagePage = () => {

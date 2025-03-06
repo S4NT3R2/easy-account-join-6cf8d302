@@ -1,10 +1,13 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { ServiceProvider } from "@/types/service.types";
 import { useMapInitialization } from "@/hooks/useMapInitialization";
 import { useProviderMarkers } from "@/hooks/useProviderMarkers";
 import { useUserLocationTracking } from "@/hooks/useUserLocationTracking";
 import { useMapStyles } from "@/hooks/useMapStyles";
+import MapTokenInput from "./MapTokenInput";
+import LocationSearch from "./LocationSearch";
+import 'mapbox-gl/dist/mapbox-gl.css';
 
 interface MapComponentProps {
   userLocation: [number, number] | null;
@@ -13,6 +16,8 @@ interface MapComponentProps {
   setSelectedProvider: (provider: ServiceProvider | null) => void;
   serviceProviders: ServiceProvider[];
   setLocationError: (error: string | null) => void;
+  isSearchOpen?: boolean;
+  onCloseSearch?: () => void;
 }
 
 const MapComponent = ({ 
@@ -21,8 +26,14 @@ const MapComponent = ({
   selectedProvider, 
   setSelectedProvider,
   serviceProviders,
-  setLocationError
+  setLocationError,
+  isSearchOpen = false,
+  onCloseSearch = () => {}
 }: MapComponentProps) => {
+  const [mapboxToken, setMapboxToken] = useState<string | undefined>(
+    localStorage.getItem('mapbox_token') || undefined
+  );
+  
   // Use custom hooks for different functionality
   const {
     mapContainer,
@@ -30,11 +41,14 @@ const MapComponent = ({
     userMarker,
     markers,
     mapInitialized,
-    getUserLocation
+    getUserLocation,
+    isTokenRequired,
+    setMapboxToken: setMapToken
   } = useMapInitialization({
     userLocation,
     setUserLocation,
-    setLocationError
+    setLocationError,
+    mapboxToken
   });
 
   // Hook for managing provider markers
@@ -56,8 +70,26 @@ const MapComponent = ({
   // Hook for map styles
   useMapStyles();
 
+  const handleTokenSubmit = (token: string) => {
+    setMapboxToken(token);
+    setMapToken(token);
+  };
+
   return (
-    <div ref={mapContainer} className="h-full w-full" />
+    <div className="h-full w-full relative">
+      {isTokenRequired && <MapTokenInput onTokenSubmit={handleTokenSubmit} />}
+      
+      {isSearchOpen && (
+        <LocationSearch 
+          map={map}
+          mapInitialized={mapInitialized}
+          onLocationSelect={setUserLocation}
+          onClose={onCloseSearch}
+        />
+      )}
+      
+      <div ref={mapContainer} className="h-full w-full" />
+    </div>
   );
 };
 

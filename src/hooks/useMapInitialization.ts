@@ -10,6 +10,7 @@ interface UseMapInitializationProps {
   userLocation: [number, number] | null;
   setUserLocation: (location: [number, number] | null) => void;
   setLocationError: (error: string | null) => void;
+  mapboxToken?: string;
 }
 
 interface UseMapInitializationResult {
@@ -19,12 +20,15 @@ interface UseMapInitializationResult {
   markers: React.MutableRefObject<mapboxgl.Marker[]>;
   mapInitialized: boolean;
   getUserLocation: () => Promise<void>;
+  isTokenRequired: boolean;
+  setMapboxToken: (token: string) => void;
 }
 
 export const useMapInitialization = ({
   userLocation,
   setUserLocation,
-  setLocationError
+  setLocationError,
+  mapboxToken: initialToken
 }: UseMapInitializationProps): UseMapInitializationResult => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
@@ -33,6 +37,22 @@ export const useMapInitialization = ({
   const styleElement = useRef<HTMLStyleElement | null>(null);
   const watchId = useRef<number | null>(null);
   const [mapInitialized, setMapInitialized] = useState(false);
+  const [mapboxToken, setMapboxToken] = useState<string | undefined>(initialToken);
+  const [isTokenRequired, setIsTokenRequired] = useState(false);
+
+  // Set Mapbox access token
+  useEffect(() => {
+    const savedToken = localStorage.getItem('mapbox_token');
+    if (savedToken) {
+      mapboxgl.accessToken = savedToken;
+      setMapboxToken(savedToken);
+    } else if (mapboxToken) {
+      mapboxgl.accessToken = mapboxToken;
+      localStorage.setItem('mapbox_token', mapboxToken);
+    } else {
+      setIsTokenRequired(true);
+    }
+  }, [mapboxToken]);
 
   // Function to get user's current location
   const getUserLocation = async () => {
@@ -58,7 +78,7 @@ export const useMapInitialization = ({
 
   // Initialize map
   useEffect(() => {
-    if (!mapContainer.current || mapInitialized) return;
+    if (!mapContainer.current || mapInitialized || !mapboxgl.accessToken) return;
     
     try {
       // First try to get user location
@@ -121,7 +141,7 @@ export const useMapInitialization = ({
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       setLocationError(`Could not load the map: ${errorMessage}`);
     }
-  }, [mapInitialized, userLocation, setUserLocation, setLocationError]);
+  }, [mapInitialized, userLocation, setUserLocation, setLocationError, mapboxToken]);
 
   return {
     mapContainer,
@@ -129,6 +149,8 @@ export const useMapInitialization = ({
     userMarker,
     markers,
     mapInitialized,
-    getUserLocation
+    getUserLocation,
+    isTokenRequired,
+    setMapboxToken
   };
 };
