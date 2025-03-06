@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -78,7 +77,8 @@ const HomePage = () => {
       {selectedProvider && (
         <ServiceProviderCard 
           provider={selectedProvider} 
-          onBookNow={handleBookNow} 
+          onBookNow={handleBookNow}
+          userLocation={userLocation}
         />
       )}
 

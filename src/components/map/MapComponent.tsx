@@ -2,8 +2,10 @@
 import { useRef, useEffect, useState } from "react";
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { toast } from "sonner";
 import { ServiceProvider } from "@/types/service.types";
+import { getCurrentLocation, watchPosition, clearWatch } from "@/services/LocationService";
+import { createUserMarker, createProviderMarker, addMapStyles } from "./MapMarker";
+import { addMapControls } from "./MapControls";
 
 // Initialize mapbox with a temporary token
 mapboxgl.accessToken = 'pk.eyJ1IjoibG92YWJsZSIsImEiOiJjbHNxOXBzZWkwMXUyMnFxbzhtbml4NnRrIn0.JDk3EwlcTF1HenYHiNx9DQ';
@@ -29,58 +31,29 @@ const MapComponent = ({
   const map = useRef<mapboxgl.Map | null>(null);
   const markers = useRef<mapboxgl.Marker[]>([]);
   const userMarker = useRef<mapboxgl.Marker | null>(null);
+  const styleElement = useRef<HTMLStyleElement | null>(null);
+  const watchId = useRef<number | null>(null);
   const [mapInitialized, setMapInitialized] = useState(false);
 
   // Function to get user's current location
-  const getUserLocation = () => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const { longitude, latitude } = position.coords;
-          setUserLocation([longitude, latitude]);
-          
-          if (map.current) {
-            map.current.flyTo({
-              center: [longitude, latitude],
-              zoom: 13,
-              duration: 1500
-            });
-            
-            // Update or create user marker
-            if (userMarker.current) {
-              userMarker.current.setLngLat([longitude, latitude]);
-            } else if (map.current) {
-              const userEl = document.createElement('div');
-              userEl.className = 'user-location-marker';
-              userEl.innerHTML = `
-                <div class="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center pulse-animation">
-                  <div class="w-4 h-4 rounded-full bg-white"></div>
-                </div>
-              `;
-              
-              userMarker.current = new mapboxgl.Marker(userEl)
-                .setLngLat([longitude, latitude])
-                .addTo(map.current);
-            }
-          }
-          setLocationError(null);
-        },
-        (error) => {
-          console.error('Error getting location:', error);
-          setLocationError(`Error getting location: ${error.message}`);
-          toast.error(`Could not access your location: ${error.message}`);
-          
-          // Default to Harare if location access fails
-          setUserLocation([31.0335, -17.8292]);
-        },
-        { enableHighAccuracy: true }
-      );
-    } else {
-      setLocationError('Geolocation is not supported by your browser');
-      toast.error('Geolocation is not supported by your browser');
+  const getUserLocation = async () => {
+    const { coords, error } = await getCurrentLocation();
+    setUserLocation(coords);
+    setLocationError(error);
+
+    if (map.current) {
+      map.current.flyTo({
+        center: coords,
+        zoom: 13,
+        duration: 1500
+      });
       
-      // Default to Harare if geolocation not supported
-      setUserLocation([31.0335, -17.8292]);
+      // Update or create user marker
+      if (userMarker.current) {
+        userMarker.current.setLngLat(coords);
+      } else if (map.current) {
+        userMarker.current = createUserMarker(coords, map.current);
+      }
     }
   };
 
@@ -94,27 +67,16 @@ const MapComponent = ({
     
     // Add new markers for service providers
     serviceProviders.forEach((provider) => {
-      const markerEl = document.createElement('div');
-      markerEl.className = 'custom-marker';
-      markerEl.innerHTML = `
-        <div class="w-12 h-12 rounded-full bg-primary/10 backdrop-blur-sm p-2 cursor-pointer hover:scale-110 transition-transform">
-          <img src="${provider.image}" class="w-full h-full object-cover rounded-full" alt="${provider.name}" />
-        </div>
-      `;
-      
-      markerEl.addEventListener('click', () => {
-        setSelectedProvider(provider);
-      });
-
-      const marker = new mapboxgl.Marker(markerEl)
-        .setLngLat(provider.location)
-        .addTo(map.current);
-      
+      const marker = createProviderMarker(
+        provider, 
+        map.current!, 
+        setSelectedProvider
+      );
       markers.current.push(marker);
     });
   };
 
-  // Initialize map with user's location
+  // Initialize map
   useEffect(() => {
     if (!mapContainer.current || mapInitialized) return;
     
@@ -141,69 +103,29 @@ const MapComponent = ({
         
         // If user location is available, add user marker
         if (userLocation && map.current) {
-          const userEl = document.createElement('div');
-          userEl.className = 'user-location-marker';
-          userEl.innerHTML = `
-            <div class="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center pulse-animation">
-              <div class="w-4 h-4 rounded-full bg-white"></div>
-            </div>
-          `;
-          
-          userMarker.current = new mapboxgl.Marker(userEl)
-            .setLngLat(userLocation)
-            .addTo(map.current);
+          userMarker.current = createUserMarker(userLocation, map.current);
         }
+
+        // Add map controls
+        addMapControls({ map: map.current });
       });
 
-      // Add location control to get current location
-      map.current.addControl(
-        new mapboxgl.GeolocateControl({
-          positionOptions: {
-            enableHighAccuracy: true
-          },
-          trackUserLocation: true,
-          showUserHeading: true
-        }),
-        'top-right'
-      );
-      
-      map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
-
       // Add CSS for the pulse animation
-      const style = document.createElement('style');
-      style.textContent = `
-        @keyframes pulse {
-          0% {
-            box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7);
-          }
-          70% {
-            box-shadow: 0 0 0 10px rgba(59, 130, 246, 0);
-          }
-          100% {
-            box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
-          }
-        }
-        
-        .pulse-animation {
-          animation: pulse 2s infinite;
-        }
-      `;
-      document.head.appendChild(style);
+      styleElement.current = addMapStyles();
 
       // Set up real-time location updates
-      const watchId = navigator.geolocation.watchPosition(
+      watchId.current = watchPosition(
         (position) => {
-          const { longitude, latitude } = position.coords;
-          setUserLocation([longitude, latitude]);
+          setUserLocation(position);
           
           if (userMarker.current) {
-            userMarker.current.setLngLat([longitude, latitude]);
+            userMarker.current.setLngLat(position);
           }
         },
         (error) => {
           console.error('Error watching position:', error);
-        },
-        { enableHighAccuracy: true }
+          setLocationError(error);
+        }
       );
 
       return () => {
@@ -221,14 +143,19 @@ const MapComponent = ({
         markers.current = [];
         
         // Remove watch position
-        navigator.geolocation.clearWatch(watchId);
+        if (watchId.current !== null) {
+          clearWatch(watchId.current);
+        }
         
         // Remove style element
-        document.head.removeChild(style);
+        if (styleElement.current) {
+          document.head.removeChild(styleElement.current);
+        }
       };
     } catch (error) {
       console.error('Error initializing map:', error);
-      toast.error("Could not load the map. Please try again later.");
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      setLocationError(`Could not load the map: ${errorMessage}`);
     }
   }, [mapInitialized, userLocation]);
 
@@ -248,19 +175,6 @@ const MapComponent = ({
       updateServiceProviderMarkers();
     }
   }, [serviceProviders, mapInitialized]);
-
-  // Function to handle provider selection
-  const handleProviderSelect = (provider: ServiceProvider) => {
-    setSelectedProvider(provider);
-    
-    if (map.current && provider.location) {
-      map.current.flyTo({
-        center: provider.location,
-        zoom: 14,
-        duration: 1500
-      });
-    }
-  };
 
   return (
     <div ref={mapContainer} className="h-full w-full" />
