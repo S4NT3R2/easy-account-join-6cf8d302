@@ -6,7 +6,7 @@ import { toast } from "sonner";
 
 const Login = () => {
   const [phoneNumber, setPhoneNumber] = useState("");
-  const [country, setCountry] = useState("United States");
+  const [city, setCity] = useState("Harare");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -16,6 +16,20 @@ const Login = () => {
     }
     // Add form submission logic here
   };
+
+  // Zimbabwean provinces and major cities
+  const zimbabweCities = [
+    "Harare",
+    "Bulawayo",
+    "Chitungwiza",
+    "Mutare",
+    "Gweru",
+    "Kwekwe",
+    "Kadoma",
+    "Masvingo",
+    "Chinhoyi",
+    "Victoria Falls"
+  ];
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-[#1A1F2C] bg-grid-white/[0.02]">
@@ -39,16 +53,15 @@ const Login = () => {
         <div className="bg-[#232836] backdrop-blur-lg border border-white/5 rounded-2xl p-8 shadow-xl space-y-6">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-              <label className="text-sm font-medium text-white">Select Country</label>
+              <label className="text-sm font-medium text-white">Select City in Zimbabwe</label>
               <select 
                 className="w-full bg-[#1A1F2C] border border-white/5 rounded-xl p-4 text-white focus:ring-2 focus:ring-primary outline-none transition-all"
-                value={country}
-                onChange={(e) => setCountry(e.target.value)}
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
               >
-                <option>United States</option>
-                <option>Canada</option>
-                <option>United Kingdom</option>
-                <option>Australia</option>
+                {zimbabweCities.map((cityName) => (
+                  <option key={cityName} value={cityName}>{cityName}</option>
+                ))}
               </select>
             </div>
 
