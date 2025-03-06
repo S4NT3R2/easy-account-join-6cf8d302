@@ -1,6 +1,6 @@
-
 import React from 'react';
 import { Navigation2 } from 'lucide-react';
+import { ServiceProvider } from "@/types/service.types";
 
 interface ServiceProviderCardProps {
   provider: ServiceProvider;
