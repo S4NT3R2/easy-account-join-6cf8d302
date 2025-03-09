@@ -59,35 +59,11 @@ const LocationSearch: React.FC<LocationSearchProps> = ({
     }
   };
 
-  const searchMapboxLocations = async () => {
-    if (!query.trim() || !mapboxgl.accessToken) return;
-    
-    setIsLoading(true);
-    try {
-      const response = await fetch(
-        `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json?access_token=${mapboxgl.accessToken}&limit=5`
-      );
-      
-      if (!response.ok) throw new Error('Search failed');
-      
-      const data = await response.json();
-      setResults(data.features);
-    } catch (error) {
-      console.error('Error searching for location:', error);
-      toast.error('Failed to search for locations');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
+  // Handle search input changes with debounce
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
-      if (query.trim()) {
-        if (isGoogleMaps) {
-          searchGoogleLocations();
-        } else {
-          searchMapboxLocations();
-        }
+      if (query.trim() && isGoogleMaps) {
+        searchGoogleLocations();
       } else {
         setResults([]);
       }
@@ -101,9 +77,6 @@ const LocationSearch: React.FC<LocationSearchProps> = ({
       const location = feature.geometry.location;
       const lng = location.lng();
       const lat = location.lat();
-      onLocationSelect([lng, lat]);
-    } else {
-      const [lng, lat] = feature.center;
       onLocationSelect([lng, lat]);
     }
     
@@ -152,15 +125,15 @@ const LocationSearch: React.FC<LocationSearchProps> = ({
             {results.length > 0 ? (
               results.map((feature, index) => (
                 <button
-                  key={isGoogleMaps ? feature.place_id : feature.id}
+                  key={feature.place_id || index}
                   onClick={() => handleSelectLocation(feature)}
                   className="w-full p-4 rounded-lg bg-[#232836] hover:bg-[#2c3143] transition-colors text-left"
                 >
                   <h3 className="text-white font-medium">
-                    {isGoogleMaps ? feature.formatted_address : feature.text}
+                    {feature.formatted_address}
                   </h3>
                   <p className="text-gray-400 text-sm">
-                    {isGoogleMaps ? feature.formatted_address : feature.place_name}
+                    {feature.formatted_address}
                   </p>
                 </button>
               ))

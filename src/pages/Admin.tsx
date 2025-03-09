@@ -4,9 +4,58 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from 'sonner';
 import { Car, ServiceProvider, Service } from '@/types/service.types';
-import { mockServiceProviders, mockCars, mockServices } from '@/data/mockData';
-import { Pencil, Trash, Plus, ArrowLeft } from 'lucide-react';
+import { mockServiceProviders } from '@/data/mockData';
+import { Pencil, Trash, Plus, ArrowLeft, Tool, Car as CarIcon, Settings } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+
+// Mock cars and services since they're not exported from mockData
+const mockCars: Car[] = [
+  {
+    id: "car1",
+    userId: "user1",
+    name: "Toyota Camry",
+    image: "/lovable-uploads/797bf7f3-5624-4894-80ae-3056c954c808.png",
+    licensePlate: "ABC 123",
+    year: "2020",
+    make: "Toyota",
+    model: "Camry"
+  },
+  {
+    id: "car2",
+    userId: "user1",
+    name: "Honda Civic",
+    image: "/lovable-uploads/797bf7f3-5624-4894-80ae-3056c954c808.png",
+    licensePlate: "XYZ 789",
+    year: "2019",
+    make: "Honda",
+    model: "Civic"
+  }
+];
+
+// Mock services
+const mockServices: Service[] = [
+  {
+    id: "service1",
+    name: "Basic Wash",
+    description: "Exterior wash and windows cleaning",
+    price: 25,
+    icon: CarIcon
+  },
+  {
+    id: "service2",
+    name: "Premium Wash",
+    description: "Exterior wash, interior cleaning, and waxing",
+    price: 45,
+    icon: Tool
+  },
+  {
+    id: "service3",
+    name: "Full Detail",
+    description: "Complete interior and exterior detailing",
+    price: 120,
+    icon: Settings
+  }
+];
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -151,7 +200,7 @@ const AdminDashboard = () => {
                 >
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 rounded bg-primary/20 flex items-center justify-center">
-                      <service.icon className="h-6 w-6 text-primary" />
+                      {React.createElement(service.icon, { className: "h-6 w-6 text-primary" })}
                     </div>
                     <div>
                       <h3 className="font-medium">{service.name}</h3>
