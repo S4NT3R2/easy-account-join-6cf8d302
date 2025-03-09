@@ -1,20 +1,50 @@
 
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Car, Facebook, ChevronRight, Phone } from "lucide-react";
 import { toast } from "sonner";
+import { useAuth } from "@/hooks/useAuth";
 
 const Login = () => {
+  const navigate = useNavigate();
+  const { signIn, user } = useAuth();
   const [phoneNumber, setPhoneNumber] = useState("");
+  const [password, setPassword] = useState("");
   const [city, setCity] = useState("Harare");
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Redirect if already logged in
+  if (user) {
+    navigate('/home');
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!phoneNumber) {
-      toast.error("Please enter your phone number");
+    
+    // Using phone number as email for this demo
+    const email = phoneNumber.includes('@') ? phoneNumber : `${phoneNumber.replace(/\s+/g, '')}@example.com`;
+    
+    if (!phoneNumber || !password) {
+      toast.error("Please enter your phone number and password");
       return;
     }
-    // Add form submission logic here
+
+    try {
+      setIsLoading(true);
+      const { error } = await signIn(email, password);
+      
+      if (error) {
+        throw error;
+      }
+      
+      toast.success("Login successful!");
+      navigate('/home');
+    } catch (error: any) {
+      toast.error(error.message || "Failed to log in");
+      console.error("Login error:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // Zimbabwean provinces and major cities
@@ -66,25 +96,48 @@ const Login = () => {
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-white">Phone Number</label>
+              <label className="text-sm font-medium text-white">Phone Number or Email</label>
               <div className="relative">
                 <Phone className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                 <input
-                  type="tel"
+                  type="text"
                   className="w-full bg-[#1A1F2C] border border-white/5 rounded-xl p-4 pl-12 text-white focus:ring-2 focus:ring-primary outline-none transition-all"
-                  placeholder="Enter your phone number"
+                  placeholder="Enter your phone number or email"
                   value={phoneNumber}
                   onChange={(e) => setPhoneNumber(e.target.value)}
                 />
               </div>
             </div>
 
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-white">Password</label>
+              <div className="relative">
+                <input
+                  type="password"
+                  className="w-full bg-[#1A1F2C] border border-white/5 rounded-xl p-4 text-white focus:ring-2 focus:ring-primary outline-none transition-all"
+                  placeholder="Enter your password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+              </div>
+            </div>
+
             <button 
               type="submit"
-              className="w-full bg-primary text-background font-semibold rounded-xl py-4 flex items-center justify-center gap-2 hover:opacity-90 transition-opacity"
+              disabled={isLoading}
+              className="w-full bg-primary text-background font-semibold rounded-xl py-4 flex items-center justify-center gap-2 hover:opacity-90 transition-opacity disabled:opacity-70"
             >
-              Continue 
-              <ChevronRight className="w-4 h-4" />
+              {isLoading ? (
+                <span className="flex items-center gap-2">
+                  <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white"></div>
+                  Logging in...
+                </span>
+              ) : (
+                <>
+                  Continue 
+                  <ChevronRight className="w-4 h-4" />
+                </>
+              )}
             </button>
           </form>
 

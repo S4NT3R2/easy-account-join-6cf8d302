@@ -1,9 +1,12 @@
 
 import { ArrowLeft, MapPin, Search } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import { useAuth } from "@/hooks/useAuth";
 
 const addressTypes = [
   { id: "home", label: "Home", icon: "🏠" },
@@ -12,6 +15,8 @@ const addressTypes = [
 ];
 
 const AddLocationPage = () => {
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const [selectedType, setSelectedType] = useState("home");
@@ -19,6 +24,7 @@ const AddLocationPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [mapboxToken, setMapboxToken] = useState("");
   const [isMapInitialized, setIsMapInitialized] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     if (!mapContainer.current || !mapboxToken || isMapInitialized) return;
@@ -47,6 +53,39 @@ const AddLocationPage = () => {
       }
     };
   }, [mapboxToken, isMapInitialized]);
+
+  const saveAddress = async () => {
+    if (!user) {
+      toast.error("You must be logged in to save an address");
+      return;
+    }
+
+    if (!address.trim()) {
+      toast.error("Please enter an address");
+      return;
+    }
+
+    try {
+      setIsSaving(true);
+      const { error } = await supabase
+        .from('addresses')
+        .insert({
+          user_id: user.id,
+          type: selectedType,
+          address: address.trim()
+        });
+
+      if (error) throw error;
+
+      toast.success("Address saved successfully");
+      navigate("/addresses");
+    } catch (error: any) {
+      toast.error("Failed to save address: " + error.message);
+      console.error("Error saving address:", error);
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   if (!mapboxToken) {
     return (
@@ -86,9 +125,6 @@ const AddLocationPage = () => {
             <ArrowLeft className="w-6 h-6" />
             <span className="text-sm">Cancel</span>
           </Link>
-          <button className="text-primary hover:text-primary/80 text-sm">
-            Continue
-          </button>
         </div>
 
         {/* Search Bar */}
@@ -145,8 +181,17 @@ const AddLocationPage = () => {
           </div>
 
           {/* Save Button */}
-          <button className="w-full p-4 rounded-xl bg-gradient-to-r from-[#1eefac] to-[#1EAEDB] text-white font-medium hover:opacity-90 transition-opacity">
-            Save
+          <button 
+            onClick={saveAddress}
+            disabled={isSaving}
+            className="w-full p-4 rounded-xl bg-gradient-to-r from-[#1eefac] to-[#1EAEDB] text-white font-medium hover:opacity-90 transition-opacity flex items-center justify-center"
+          >
+            {isSaving ? (
+              <span className="flex items-center gap-2">
+                <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white"></div>
+                Saving...
+              </span>
+            ) : "Save"}
           </button>
         </div>
       </div>

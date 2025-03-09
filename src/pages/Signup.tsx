@@ -1,27 +1,67 @@
 
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Car, Facebook, ChevronRight, User, Mail, Phone } from "lucide-react";
+import { Car, Facebook, ChevronRight, User, Mail, Phone, Lock } from "lucide-react";
 import { toast } from "sonner";
+import { useAuth } from "@/hooks/useAuth";
 
 const Signup = () => {
   const navigate = useNavigate();
+  const { signUp, user } = useAuth();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     phoneNumber: "",
+    password: "",
+    confirmPassword: ""
   });
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Redirect if already logged in
+  if (user) {
+    navigate('/home');
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.name || !formData.email || !formData.phoneNumber) {
-      toast.error("Please fill in all fields");
+    if (!formData.name || !formData.phoneNumber || !formData.password) {
+      toast.error("Please fill in all required fields");
       return;
     }
 
-    toast.success("Account created successfully!");
-    navigate("/login");
+    if (formData.password !== formData.confirmPassword) {
+      toast.error("Passwords do not match");
+      return;
+    }
+
+    if (formData.password.length < 6) {
+      toast.error("Password must be at least 6 characters");
+      return;
+    }
+
+    // Using phone number as email if no email is provided
+    const email = formData.email || `${formData.phoneNumber.replace(/\s+/g, '')}@example.com`;
+
+    try {
+      setIsLoading(true);
+      const { error } = await signUp(email, formData.password, {
+        full_name: formData.name,
+        phone_number: formData.phoneNumber
+      });
+      
+      if (error) {
+        throw error;
+      }
+      
+      toast.success("Account created successfully! You can now login.");
+      navigate('/login');
+    } catch (error: any) {
+      toast.error(error.message || "Failed to create account");
+      console.error("Signup error:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -46,7 +86,7 @@ const Signup = () => {
         <div className="bg-[#232836] backdrop-blur-lg border border-white/5 rounded-2xl p-8 shadow-xl">
           <form className="space-y-6" onSubmit={handleSubmit}>
             <div className="space-y-2">
-              <label className="text-sm font-medium text-white">Full Name</label>
+              <label className="text-sm font-medium text-white">Full Name <span className="text-red-500">*</span></label>
               <div className="relative">
                 <User className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                 <input
@@ -61,7 +101,7 @@ const Signup = () => {
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-white">Email</label>
+              <label className="text-sm font-medium text-white">Email (Optional)</label>
               <div className="relative">
                 <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                 <input
@@ -70,13 +110,12 @@ const Signup = () => {
                   placeholder="Enter your email"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  required
                 />
               </div>
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-white">Phone Number</label>
+              <label className="text-sm font-medium text-white">Phone Number <span className="text-red-500">*</span></label>
               <div className="relative">
                 <Phone className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                 <input
@@ -90,12 +129,52 @@ const Signup = () => {
               </div>
             </div>
 
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-white">Password <span className="text-red-500">*</span></label>
+              <div className="relative">
+                <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <input
+                  type="password"
+                  className="w-full bg-[#1A1F2C] border border-white/5 rounded-xl p-4 pl-12 text-white focus:ring-2 focus:ring-primary outline-none transition-all"
+                  placeholder="Create password"
+                  value={formData.password}
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-white">Confirm Password <span className="text-red-500">*</span></label>
+              <div className="relative">
+                <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <input
+                  type="password"
+                  className="w-full bg-[#1A1F2C] border border-white/5 rounded-xl p-4 pl-12 text-white focus:ring-2 focus:ring-primary outline-none transition-all"
+                  placeholder="Confirm password"
+                  value={formData.confirmPassword}
+                  onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                  required
+                />
+              </div>
+            </div>
+
             <button 
               type="submit"
-              className="w-full bg-primary text-background font-semibold rounded-xl py-4 flex items-center justify-center gap-2 hover:opacity-90 transition-opacity"
+              disabled={isLoading}
+              className="w-full bg-primary text-background font-semibold rounded-xl py-4 flex items-center justify-center gap-2 hover:opacity-90 transition-opacity disabled:opacity-70"
             >
-              Create Account
-              <ChevronRight className="w-4 h-4" />
+              {isLoading ? (
+                <span className="flex items-center gap-2">
+                  <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white"></div>
+                  Creating account...
+                </span>
+              ) : (
+                <>
+                  Create Account
+                  <ChevronRight className="w-4 h-4" />
+                </>
+              )}
             </button>
 
             <div className="relative my-6">
