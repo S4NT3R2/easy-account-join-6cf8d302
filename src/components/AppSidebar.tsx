@@ -1,5 +1,5 @@
 
-import { X, Shield, Car, MapPin, Heart, Globe, MessageSquare, LogOut } from "lucide-react";
+import { X, Shield, Car, MapPin, Heart, Globe, MessageSquare, LogOut, Settings } from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -94,6 +94,11 @@ const menuItems = [
     path: "/favorites",
   },
   {
+    icon: Settings,
+    label: "Admin Dashboard",
+    path: "/admin",
+  },
+  {
     icon: Globe,
     label: "Change Language",
     path: "/language",
@@ -109,3 +114,4 @@ const menuItems = [
     path: "/login",
   },
 ];
+

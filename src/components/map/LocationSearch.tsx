@@ -2,25 +2,34 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Search, X } from 'lucide-react';
 import { toast } from 'sonner';
-import mapboxgl from 'mapbox-gl';
 
 interface LocationSearchProps {
-  map: React.RefObject<mapboxgl.Map | null>;
+  map: React.RefObject<mapboxgl.Map | null> | React.RefObject<google.maps.Map | null>;
   mapInitialized: boolean;
   onLocationSelect: (coords: [number, number]) => void;
   onClose: () => void;
+  isGoogleMaps?: boolean;
 }
 
 const LocationSearch: React.FC<LocationSearchProps> = ({ 
   map, 
   mapInitialized, 
   onLocationSelect,
-  onClose
+  onClose,
+  isGoogleMaps = false
 }) => {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const geocoderRef = useRef<google.maps.Geocoder | null>(null);
+
+  // Initialize Google Maps Geocoder
+  useEffect(() => {
+    if (isGoogleMaps && window.google && window.google.maps) {
+      geocoderRef.current = new google.maps.Geocoder();
+    }
+  }, [isGoogleMaps]);
 
   // Focus input on mount
   useEffect(() => {
@@ -29,7 +38,28 @@ const LocationSearch: React.FC<LocationSearchProps> = ({
     }
   }, []);
 
-  const searchLocations = async () => {
+  const searchGoogleLocations = async () => {
+    if (!query.trim() || !geocoderRef.current) return;
+    
+    setIsLoading(true);
+    try {
+      geocoderRef.current.geocode({ address: query }, (results, status) => {
+        if (status === "OK" && results && results.length > 0) {
+          setResults(results);
+        } else {
+          setResults([]);
+          toast.error('No locations found');
+        }
+        setIsLoading(false);
+      });
+    } catch (error) {
+      console.error('Error searching for location:', error);
+      toast.error('Failed to search for locations');
+      setIsLoading(false);
+    }
+  };
+
+  const searchMapboxLocations = async () => {
     if (!query.trim() || !mapboxgl.accessToken) return;
     
     setIsLoading(true);
@@ -53,25 +83,28 @@ const LocationSearch: React.FC<LocationSearchProps> = ({
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
       if (query.trim()) {
-        searchLocations();
+        if (isGoogleMaps) {
+          searchGoogleLocations();
+        } else {
+          searchMapboxLocations();
+        }
       } else {
         setResults([]);
       }
     }, 500);
 
     return () => clearTimeout(delayDebounceFn);
-  }, [query]);
+  }, [query, isGoogleMaps]);
 
   const handleSelectLocation = (feature: any) => {
-    const [lng, lat] = feature.center;
-    onLocationSelect([lng, lat]);
-    
-    if (map.current) {
-      map.current.flyTo({
-        center: [lng, lat],
-        zoom: 13,
-        duration: 1500
-      });
+    if (isGoogleMaps) {
+      const location = feature.geometry.location;
+      const lng = location.lng();
+      const lat = location.lat();
+      onLocationSelect([lng, lat]);
+    } else {
+      const [lng, lat] = feature.center;
+      onLocationSelect([lng, lat]);
     }
     
     onClose();
@@ -117,14 +150,18 @@ const LocationSearch: React.FC<LocationSearchProps> = ({
         ) : (
           <div className="p-4 space-y-2">
             {results.length > 0 ? (
-              results.map((feature) => (
+              results.map((feature, index) => (
                 <button
-                  key={feature.id}
+                  key={isGoogleMaps ? feature.place_id : feature.id}
                   onClick={() => handleSelectLocation(feature)}
                   className="w-full p-4 rounded-lg bg-[#232836] hover:bg-[#2c3143] transition-colors text-left"
                 >
-                  <h3 className="text-white font-medium">{feature.text}</h3>
-                  <p className="text-gray-400 text-sm">{feature.place_name}</p>
+                  <h3 className="text-white font-medium">
+                    {isGoogleMaps ? feature.formatted_address : feature.text}
+                  </h3>
+                  <p className="text-gray-400 text-sm">
+                    {isGoogleMaps ? feature.formatted_address : feature.place_name}
+                  </p>
                 </button>
               ))
             ) : query.trim() ? (

@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { SelectCarSheet } from "@/components/SelectCarSheet";
 import { ServicesSheet } from "@/components/ServicesSheet";
 import { DateTimeSheet } from "@/components/DateTimeSheet";
-import MapComponent from "@/components/map/MapComponent";
+import GoogleMapComponent from "@/components/map/GoogleMapComponent";
 import ServiceProviderCard from "@/components/providers/ServiceProviderCard";
 import BottomNavigation from "@/components/navigation/BottomNavigation";
 import LocateButton from "@/components/buttons/LocateButton";
@@ -64,7 +64,7 @@ const HomePage = () => {
   return (
     <div className="relative h-screen w-full bg-[#1A1F2C]">
       <div className="absolute inset-0 bg-[#1A1F2C]">
-        <MapComponent
+        <GoogleMapComponent
           userLocation={userLocation}
           setUserLocation={setUserLocation}
           selectedProvider={selectedProvider}

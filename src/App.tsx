@@ -21,6 +21,7 @@ import BookingDetailsPage from "./pages/BookingDetails";
 import ContactPage from "./pages/Contact";
 import FavoritesPage from "./pages/Favorites";
 import ProfilePage from "./pages/Profile";
+import AdminDashboard from "./pages/Admin";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -78,6 +79,7 @@ const AppContent = () => {
         <Route path="/contact" element={<ContactPage />} />
         <Route path="/favorites" element={<FavoritesPage />} />
         <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/bookings" element={<Navigate to="/booking-details" replace />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
