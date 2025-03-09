@@ -2,11 +2,10 @@
 import { ArrowLeft, MapPin, Search } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
-import mapboxgl from "mapbox-gl";
-import "mapbox-gl/dist/mapbox-gl.css";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
+import { GoogleMap, useJsApiLoader } from '@react-google-maps/api';
 
 const addressTypes = [
   { id: "home", label: "Home", icon: "🏠" },
@@ -14,45 +13,154 @@ const addressTypes = [
   { id: "other", label: "Other", icon: "📍" },
 ];
 
+// Use a valid Google Maps API key
+const GOOGLE_MAPS_API_KEY = "AIzaSyD3INX2lzW5Ua6r77kXZf8_xZjNZUq2I8A";
+
+// Map container style
+const mapContainerStyle = {
+  width: '100%',
+  height: '100%'
+};
+
+// Map options
+const mapOptions = {
+  disableDefaultUI: false,
+  zoomControl: true,
+  mapTypeControl: false,
+  streetViewControl: false,
+  fullscreenControl: true,
+  styles: [
+    {
+      featureType: "all",
+      elementType: "geometry",
+      stylers: [{ color: "#242f3e" }]
+    },
+    {
+      featureType: "all",
+      elementType: "labels.text.stroke",
+      stylers: [{ color: "#242f3e" }]
+    },
+    {
+      featureType: "all",
+      elementType: "labels.text.fill",
+      stylers: [{ color: "#746855" }]
+    },
+    {
+      featureType: "water",
+      elementType: "geometry",
+      stylers: [{ color: "#17263c" }]
+    }
+  ]
+};
+
 const AddLocationPage = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const mapContainer = useRef<HTMLDivElement>(null);
-  const map = useRef<mapboxgl.Map | null>(null);
   const [selectedType, setSelectedType] = useState("home");
   const [address, setAddress] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
-  const [mapboxToken, setMapboxToken] = useState("");
-  const [isMapInitialized, setIsMapInitialized] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [locationCoords, setLocationCoords] = useState<[number, number]>([31.0335, -17.8292]); // Default to Harare
+  const mapRef = useRef<google.maps.Map | null>(null);
+  const markerRef = useRef<google.maps.Marker | null>(null);
+  const geocoder = useRef<google.maps.Geocoder | null>(null);
 
+  // Load Google Maps API
+  const { isLoaded } = useJsApiLoader({
+    id: 'google-map-script',
+    googleMapsApiKey: GOOGLE_MAPS_API_KEY
+  });
+
+  // Initialize geocoder when maps API is loaded
   useEffect(() => {
-    if (!mapContainer.current || !mapboxToken || isMapInitialized) return;
-
-    try {
-      mapboxgl.accessToken = mapboxToken;
-      map.current = new mapboxgl.Map({
-        container: mapContainer.current,
-        style: "mapbox://styles/mapbox/dark-v11",
-        center: [-92.5, 39.7], // Centered on Missouri (approximately)
-        zoom: 7,
-      });
-
-      // Add navigation controls
-      map.current.addControl(new mapboxgl.NavigationControl(), "bottom-right");
-      
-      setIsMapInitialized(true);
-    } catch (error) {
-      console.error("Error initializing map:", error);
+    if (isLoaded && !geocoder.current) {
+      geocoder.current = new google.maps.Geocoder();
     }
+  }, [isLoaded]);
 
-    return () => {
-      if (map.current) {
-        map.current.remove();
-        setIsMapInitialized(false);
+  // Get user's current location
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { longitude, latitude } = position.coords;
+          setLocationCoords([longitude, latitude]);
+          
+          // Reverse geocode to get address
+          if (geocoder.current) {
+            geocoder.current.geocode({ 
+              location: { lat: latitude, lng: longitude } 
+            }, (results, status) => {
+              if (status === "OK" && results && results[0]) {
+                setAddress(results[0].formatted_address);
+              }
+            });
+          }
+        },
+        (error) => {
+          console.error('Error getting location:', error);
+          toast.error(`Could not get your location: ${error.message}`);
+        },
+        { enableHighAccuracy: true }
+      );
+    }
+  }, [isLoaded]);
+
+  const onMapLoad = (map: google.maps.Map) => {
+    mapRef.current = map;
+    
+    // Create a marker
+    markerRef.current = new google.maps.Marker({
+      position: { lat: locationCoords[1], lng: locationCoords[0] },
+      map,
+      draggable: true,
+      animation: google.maps.Animation.DROP,
+      title: 'Drag to set exact location'
+    });
+    
+    // Set up marker drag event
+    markerRef.current.addListener('dragend', () => {
+      const position = markerRef.current?.getPosition();
+      if (position) {
+        setLocationCoords([position.lng(), position.lat()]);
+        
+        // Reverse geocode to get address
+        if (geocoder.current) {
+          geocoder.current.geocode({ 
+            location: { lat: position.lat(), lng: position.lng() } 
+          }, (results, status) => {
+            if (status === "OK" && results && results[0]) {
+              setAddress(results[0].formatted_address);
+            }
+          });
+        }
       }
-    };
-  }, [mapboxToken, isMapInitialized]);
+    });
+  };
+
+  const handleSearch = () => {
+    if (!searchQuery.trim() || !geocoder.current) return;
+    
+    geocoder.current.geocode({ address: searchQuery }, (results, status) => {
+      if (status === "OK" && results && results[0]) {
+        const location = results[0].geometry.location;
+        setLocationCoords([location.lng(), location.lat()]);
+        setAddress(results[0].formatted_address);
+        
+        if (mapRef.current) {
+          mapRef.current.panTo(location);
+          mapRef.current.setZoom(15);
+        }
+        
+        if (markerRef.current) {
+          markerRef.current.setPosition(location);
+        }
+      } else {
+        toast.error('No locations found for your search');
+      }
+    });
+  };
 
   const saveAddress = async () => {
     if (!user) {
@@ -87,25 +195,11 @@ const AddLocationPage = () => {
     }
   };
 
-  if (!mapboxToken) {
+  if (!isLoaded) {
     return (
       <div className="min-h-screen bg-[#1A1F2C] p-4 flex flex-col items-center justify-center">
-        <div className="max-w-md w-full space-y-4">
-          <h2 className="text-xl text-white text-center mb-4">Enter Mapbox Token</h2>
-          <p className="text-sm text-gray-400 text-center mb-6">
-            To use the map feature, please enter your Mapbox public token. You can find this in your Mapbox account dashboard.
-          </p>
-          <input
-            type="text"
-            value={mapboxToken}
-            onChange={(e) => setMapboxToken(e.target.value)}
-            placeholder="Enter your Mapbox public token"
-            className="w-full p-4 rounded-xl bg-[#232836] text-white border border-gray-700/50 focus:border-primary transition-colors text-sm"
-          />
-          <p className="text-xs text-gray-500 text-center">
-            Visit <a href="https://mapbox.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">mapbox.com</a> to get your token
-          </p>
-        </div>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+        <p className="mt-4 text-white">Loading map...</p>
       </div>
     );
   }
@@ -114,7 +208,15 @@ const AddLocationPage = () => {
     <div className="min-h-screen bg-[#1A1F2C]">
       {/* Map Container */}
       <div className="relative h-[55vh]">
-        <div ref={mapContainer} className="absolute inset-0" />
+        <div className="absolute inset-0">
+          <GoogleMap
+            mapContainerStyle={mapContainerStyle}
+            center={{ lat: locationCoords[1], lng: locationCoords[0] }}
+            zoom={14}
+            options={mapOptions}
+            onLoad={onMapLoad}
+          />
+        </div>
         
         {/* Header */}
         <div className="absolute top-0 left-0 right-0 p-4 flex items-center justify-between z-10">
@@ -135,10 +237,14 @@ const AddLocationPage = () => {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
               placeholder="Search Location"
               className="w-full pl-12 pr-12 py-3.5 rounded-xl bg-[#232836] text-white border border-gray-700/50 focus:border-primary transition-colors text-sm"
             />
-            <button className="absolute right-4 top-1/2 -translate-y-1/2">
+            <button 
+              onClick={handleSearch}
+              className="absolute right-4 top-1/2 -translate-y-1/2"
+            >
               <MapPin className="w-5 h-5 text-primary" />
             </button>
           </div>

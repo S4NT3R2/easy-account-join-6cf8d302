@@ -1,25 +1,67 @@
 
-import { ArrowLeft, MoreVertical, Plus } from "lucide-react";
-import { Link } from "react-router-dom";
-
-const cars = [
-  {
-    id: "1",
-    name: "Vanquish S",
-    brand: "Aston Martine",
-    plateNumber: "FYD 6778",
-    image: "/lovable-uploads/797bf7f3-5624-4894-80ae-3056c954c808.png",
-  },
-  {
-    id: "2",
-    name: "BMW M4",
-    brand: "BMW",
-    plateNumber: "MYS 5521",
-    image: "/lovable-uploads/abb66627-cad4-4c4f-8531-2210017f4336.png",
-  },
-];
+import { ArrowLeft, MoreVertical, Plus, Trash2 } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+import { toast } from "sonner";
+import { Car } from "@/types/service.types";
 
 const CarsPage = () => {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const [cars, setCars] = useState<Car[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [showDeleteMenu, setShowDeleteMenu] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!user) return;
+
+    const fetchCars = async () => {
+      try {
+        setLoading(true);
+        const { data, error } = await supabase
+          .from('cars')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false });
+
+        if (error) {
+          throw error;
+        }
+
+        setCars(data || []);
+      } catch (error: any) {
+        toast.error("Failed to load cars: " + error.message);
+        console.error("Error fetching cars:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCars();
+  }, [user]);
+
+  const handleDeleteCar = async (carId: string) => {
+    try {
+      const { error } = await supabase
+        .from('cars')
+        .delete()
+        .eq('id', carId);
+
+      if (error) {
+        throw error;
+      }
+
+      setCars(cars.filter(car => car.id !== carId));
+      toast.success("Car deleted successfully");
+      setShowDeleteMenu(null);
+    } catch (error: any) {
+      toast.error("Failed to delete car: " + error.message);
+      console.error("Error deleting car:", error);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#1A1F2C] p-4">
       {/* Header */}
@@ -32,31 +74,58 @@ const CarsPage = () => {
 
       {/* Car List */}
       <div className="space-y-4">
-        {cars.map((car) => (
-          <div 
-            key={car.id}
-            className="relative rounded-xl overflow-hidden bg-[#232836] group hover:ring-2 hover:ring-primary/50 transition-all"
-          >
-            <img 
-              src={car.image} 
-              alt={car.name} 
-              className="w-full h-48 object-cover"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent" />
-            <div className="absolute bottom-0 left-0 right-0 p-4">
-              <div className="flex items-start justify-between">
-                <div>
-                  <h3 className="text-lg font-medium text-white">{car.name}</h3>
-                  <p className="text-sm text-gray-400">{car.brand}</p>
-                  <p className="text-xs text-gray-500 mt-1">{car.plateNumber}</p>
+        {loading ? (
+          <div className="flex justify-center py-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
+          </div>
+        ) : cars.length === 0 ? (
+          <div className="py-8 text-center text-gray-400">
+            <p>No cars added yet. Add your first car.</p>
+          </div>
+        ) : (
+          cars.map((car) => (
+            <div 
+              key={car.id}
+              className="relative rounded-xl overflow-hidden bg-[#232836] group hover:ring-2 hover:ring-primary/50 transition-all"
+            >
+              <img 
+                src={car.image || "/placeholder.svg"} 
+                alt={car.name} 
+                className="w-full h-48 object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent" />
+              <div className="absolute bottom-0 left-0 right-0 p-4">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <h3 className="text-lg font-medium text-white">{car.name}</h3>
+                    <p className="text-sm text-gray-400">{car.brand}</p>
+                    <p className="text-xs text-gray-500 mt-1">{car.plate_number}</p>
+                  </div>
+                  <div className="relative">
+                    <button 
+                      onClick={() => setShowDeleteMenu(showDeleteMenu === car.id ? null : car.id)}
+                      className="p-2 rounded-full hover:bg-white/10 transition-colors"
+                    >
+                      <MoreVertical className="w-5 h-5 text-white" />
+                    </button>
+                    
+                    {showDeleteMenu === car.id && (
+                      <div className="absolute right-0 top-full mt-1 bg-[#2c3143] rounded-lg shadow-xl z-10 w-32 overflow-hidden">
+                        <button 
+                          onClick={() => handleDeleteCar(car.id)}
+                          className="w-full text-left px-3 py-2 text-red-400 hover:bg-white/5 flex items-center gap-2"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                          Delete
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 </div>
-                <button className="p-2 rounded-full hover:bg-white/10 transition-colors">
-                  <MoreVertical className="w-5 h-5 text-white" />
-                </button>
               </div>
             </div>
-          </div>
-        ))}
+          ))
+        )}
       </div>
 
       {/* Add Car Button */}

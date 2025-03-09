@@ -20,6 +20,7 @@ export function AppSidebar({ open, onOpenChange }: AppSidebarProps) {
   const { user, signOut } = useAuth();
   const [profileData, setProfileData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -37,6 +38,12 @@ export function AppSidebar({ open, onOpenChange }: AppSidebarProps) {
         }
         
         setProfileData(data);
+        
+        // Check if user is admin (in a real app, this would come from a role system)
+        // For this demo, we'll just set a specific user as admin
+        if (user.email === "mcdchiez16.mtc@gmail.com") {
+          setIsAdmin(true);
+        }
       } catch (error) {
         console.error("Error fetching profile:", error);
       } finally {
@@ -62,6 +69,68 @@ export function AppSidebar({ open, onOpenChange }: AppSidebarProps) {
       toast.error("Error signing out");
     }
   };
+
+  // Create menu items dynamically based on user role
+  const getMenuItems = () => {
+    let items = [
+      {
+        icon: Shield,
+        label: "My Bookings",
+        path: "/booking-details",
+        action: 'navigate'
+      },
+      {
+        icon: Car,
+        label: "My Cars",
+        path: "/cars",
+        action: 'navigate'
+      },
+      {
+        icon: MapPin,
+        label: "My Addresses",
+        path: "/addresses",
+        action: 'navigate'
+      },
+      {
+        icon: Heart,
+        label: "Favorites",
+        path: "/favorites",
+        action: 'navigate'
+      },
+      {
+        icon: Globe,
+        label: "Change Language",
+        path: "/language",
+        action: 'navigate'
+      },
+      {
+        icon: MessageSquare,
+        label: "Contact us",
+        path: "/contact",
+        action: 'navigate'
+      },
+      {
+        icon: LogOut,
+        label: "Logout",
+        path: "/login",
+        action: 'signout'
+      },
+    ];
+
+    // Only add admin link for admin users
+    if (isAdmin) {
+      items.splice(4, 0, {
+        icon: Settings,
+        label: "Admin Dashboard",
+        path: "/admin",
+        action: 'navigate'
+      });
+    }
+
+    return items;
+  };
+
+  const menuItems = getMenuItems();
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -126,54 +195,3 @@ export function AppSidebar({ open, onOpenChange }: AppSidebarProps) {
     </Sheet>
   );
 }
-
-const menuItems = [
-  {
-    icon: Shield,
-    label: "My Bookings",
-    path: "/booking-details",
-    action: 'navigate'
-  },
-  {
-    icon: Car,
-    label: "My Cars",
-    path: "/cars",
-    action: 'navigate'
-  },
-  {
-    icon: MapPin,
-    label: "My Addresses",
-    path: "/addresses",
-    action: 'navigate'
-  },
-  {
-    icon: Heart,
-    label: "Favorites",
-    path: "/favorites",
-    action: 'navigate'
-  },
-  {
-    icon: Settings,
-    label: "Admin Dashboard",
-    path: "/admin",
-    action: 'navigate'
-  },
-  {
-    icon: Globe,
-    label: "Change Language",
-    path: "/language",
-    action: 'navigate'
-  },
-  {
-    icon: MessageSquare,
-    label: "Contact us",
-    path: "/contact",
-    action: 'navigate'
-  },
-  {
-    icon: LogOut,
-    label: "Logout",
-    path: "/login",
-    action: 'signout'
-  },
-];

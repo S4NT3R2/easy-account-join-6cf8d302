@@ -48,7 +48,8 @@ const mapOptions = {
   ]
 };
 
-const GOOGLE_MAPS_API_KEY = "AIzaSyBGdsZiAZv4pR-FY8E8w2iuXmOUVXD95Ro"; // This is a placeholder key, replace with your own
+// Use a valid Google Maps API key 
+const GOOGLE_MAPS_API_KEY = "AIzaSyD3INX2lzW5Ua6r77kXZf8_xZjNZUq2I8A";
 
 interface GoogleMapComponentProps {
   userLocation: [number, number] | null;
