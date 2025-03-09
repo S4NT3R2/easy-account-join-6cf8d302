@@ -1,16 +1,24 @@
 
+import { LucideIcon } from 'lucide-react';
+
 export interface Service {
   id: string;
   name: string;
+  description?: string;
   price: number;
-  icon: React.ReactNode;
+  icon: LucideIcon;
 }
 
 export interface Car {
   id: string;
+  userId?: string;
   name: string;
-  plateNumber: string;
+  make?: string;
+  model?: string;
+  year?: string;
+  licensePlate?: string;
   image: string;
+  plateNumber?: string;
 }
 
 export interface ServiceProvider {

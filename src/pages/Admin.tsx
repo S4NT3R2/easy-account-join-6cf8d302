@@ -5,7 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from 'sonner';
 import { Car, ServiceProvider, Service } from '@/types/service.types';
 import { mockServiceProviders } from '@/data/mockData';
-import { Pencil, Trash, Plus, ArrowLeft, Tool, Car as CarIcon, Settings } from 'lucide-react';
+import { Pencil, Trash, Plus, ArrowLeft, Wrench, Car as CarIcon, Settings } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 // Mock cars and services since they're not exported from mockData
@@ -46,7 +46,7 @@ const mockServices: Service[] = [
     name: "Premium Wash",
     description: "Exterior wash, interior cleaning, and waxing",
     price: 45,
-    icon: Tool
+    icon: Wrench // Using Wrench instead of Tool which doesn't exist
   },
   {
     id: "service3",
@@ -160,12 +160,12 @@ const AdminDashboard = () => {
                   <div className="flex items-center gap-4">
                     <img 
                       src={car.image} 
-                      alt={car.make} 
+                      alt={car.name} 
                       className="w-12 h-12 rounded object-cover"
                     />
                     <div>
-                      <h3 className="font-medium">{car.year} {car.make} {car.model}</h3>
-                      <p className="text-sm text-gray-400">{car.licensePlate}</p>
+                      <h3 className="font-medium">{car.make && car.model ? `${car.year} ${car.make} ${car.model}` : car.name}</h3>
+                      <p className="text-sm text-gray-400">{car.licensePlate || car.plateNumber}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
@@ -200,7 +200,7 @@ const AdminDashboard = () => {
                 >
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 rounded bg-primary/20 flex items-center justify-center">
-                      {React.createElement(service.icon, { className: "h-6 w-6 text-primary" })}
+                      <service.icon className="h-6 w-6 text-primary" />
                     </div>
                     <div>
                       <h3 className="font-medium">{service.name}</h3>
