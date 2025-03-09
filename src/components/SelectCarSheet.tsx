@@ -1,23 +1,16 @@
 
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Car, Plus } from "lucide-react";
-
-interface Car {
-  id: string;
-  name: string;
-  plateNumber: string;
-  image: string;
-  selected?: boolean;
-}
+import { Car as CarType } from "@/types/service.types";
 
 interface SelectCarSheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  selectedCar: Car | null;
-  onSelectCar: (car: Car) => void;
+  selectedCar: CarType | null;
+  onSelectCar: (car: CarType) => void;
 }
 
-const cars: Car[] = [
+const cars: CarType[] = [
   {
     id: "1",
     name: "Vanquish S Aston Martine",

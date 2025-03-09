@@ -1,13 +1,7 @@
 
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Car, Shell, Sparkles, Brush } from "lucide-react";
-
-interface Service {
-  id: string;
-  name: string;
-  price: number;
-  icon: React.ReactNode;
-}
+import { Service } from "@/types/service.types";
 
 interface ServicesSheetProps {
   open: boolean;
@@ -21,25 +15,25 @@ const services: Service[] = [
     id: "bodywash",
     name: "Bodywash",
     price: 50,
-    icon: <Car className="w-6 h-6" />,
+    icon: Car,
   },
   {
     id: "interior",
     name: "Interior Cleaning",
     price: 70,
-    icon: <Sparkles className="w-6 h-6" />,
+    icon: Sparkles,
   },
   {
     id: "engine",
     name: "Engine detailing",
     price: 85,
-    icon: <Shell className="w-6 h-6" />,
+    icon: Shell,
   },
   {
     id: "polish",
     name: "Car Polish",
     price: 45,
-    icon: <Brush className="w-6 h-6" />,
+    icon: Brush,
   },
 ];
 
@@ -72,7 +66,7 @@ export function ServicesSheet({ open, onOpenChange, selectedService, onSelectSer
                 <div className={`transition-colors duration-300 ${
                   selectedService?.id === service.id ? "text-secondary" : "text-primary"
                 }`}>
-                  {service.icon}
+                  <service.icon className="w-6 h-6" />
                 </div>
               </div>
               <div className="text-sm font-medium text-white">{service.name}</div>

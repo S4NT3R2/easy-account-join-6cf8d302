@@ -61,6 +61,15 @@ const HomePage = () => {
     }
   };
 
+  // Create properly typed handlers for our components
+  const handleSelectCar = (car: Car) => {
+    setSelectedCar(car);
+  };
+
+  const handleSelectService = (service: Service) => {
+    setSelectedService(service);
+  };
+
   return (
     <div className="relative h-screen w-full bg-[#1A1F2C]">
       <div className="absolute inset-0 bg-[#1A1F2C]">
@@ -98,14 +107,14 @@ const HomePage = () => {
         open={isSelectCarOpen}
         onOpenChange={setIsSelectCarOpen}
         selectedCar={selectedCar}
-        onSelectCar={setSelectedCar}
+        onSelectCar={handleSelectCar}
       />
 
       <ServicesSheet
         open={isServicesOpen}
         onOpenChange={setIsServicesOpen}
         selectedService={selectedService}
-        onSelectService={setSelectedService}
+        onSelectService={handleSelectService}
       />
 
       <DateTimeSheet
