@@ -22,6 +22,11 @@ import ContactPage from "./pages/Contact";
 import FavoritesPage from "./pages/Favorites";
 import ProfilePage from "./pages/Profile";
 import AdminDashboard from "./pages/Admin";
+import ProviderDashboard from "./pages/ProviderDashboard";
+import ProviderAddSite from "./pages/ProviderAddSite";
+import ProviderEditSite from "./pages/ProviderEditSite";
+import ProviderAddService from "./pages/ProviderAddService";
+import ProviderEditService from "./pages/ProviderEditService";
 import { AuthProvider, RequireAuth } from "./hooks/useAuth";
 
 const queryClient = new QueryClient({
@@ -81,6 +86,11 @@ const AppContent = () => {
         <Route path="/favorites" element={<RequireAuth><FavoritesPage /></RequireAuth>} />
         <Route path="/profile" element={<RequireAuth><ProfilePage /></RequireAuth>} />
         <Route path="/admin" element={<RequireAuth><AdminDashboard /></RequireAuth>} />
+        <Route path="/provider/dashboard" element={<RequireAuth><ProviderDashboard /></RequireAuth>} />
+        <Route path="/provider/add-site" element={<RequireAuth><ProviderAddSite /></RequireAuth>} />
+        <Route path="/provider/edit-site/:id" element={<RequireAuth><ProviderEditSite /></RequireAuth>} />
+        <Route path="/provider/add-service/:providerId" element={<RequireAuth><ProviderAddService /></RequireAuth>} />
+        <Route path="/provider/edit-service/:serviceId" element={<RequireAuth><ProviderEditService /></RequireAuth>} />
         <Route path="/bookings" element={<Navigate to="/booking-details" replace />} />
         <Route path="*" element={<NotFound />} />
       </Routes>

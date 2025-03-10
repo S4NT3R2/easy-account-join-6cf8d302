@@ -108,6 +108,86 @@ export type Database = {
         }
         Relationships: []
       }
+      provider_services: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          price: number
+          provider_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          price?: number
+          provider_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          price?: number
+          provider_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "provider_services_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "service_providers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      service_providers: {
+        Row: {
+          address: string
+          cost: number | null
+          created_at: string
+          id: string
+          image: string | null
+          is_active: boolean | null
+          location: number[]
+          name: string
+          rating: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          address: string
+          cost?: number | null
+          created_at?: string
+          id?: string
+          image?: string | null
+          is_active?: boolean | null
+          location: number[]
+          name: string
+          rating?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          address?: string
+          cost?: number | null
+          created_at?: string
+          id?: string
+          image?: string | null
+          is_active?: boolean | null
+          location?: number[]
+          name?: string
+          rating?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

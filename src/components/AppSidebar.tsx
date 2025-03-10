@@ -1,5 +1,5 @@
 
-import { X, Shield, Car, MapPin, Heart, Globe, MessageSquare, LogOut, Settings } from "lucide-react";
+import { X, Shield, Car, MapPin, Heart, Globe, MessageSquare, LogOut, Settings, Store } from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -21,6 +21,7 @@ export function AppSidebar({ open, onOpenChange }: AppSidebarProps) {
   const [profileData, setProfileData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isServiceProvider, setIsServiceProvider] = useState(false);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -39,11 +40,19 @@ export function AppSidebar({ open, onOpenChange }: AppSidebarProps) {
         
         setProfileData(data);
         
-        // Check if user is admin (in a real app, this would come from a role system)
-        // For this demo, we'll just set a specific user as admin
+        // Check if user is admin
         if (user.email === "mcdchiez16.mtc@gmail.com") {
           setIsAdmin(true);
         }
+        
+        // Check if user is a service provider
+        const { data: providerData } = await supabase
+          .from('service_providers')
+          .select('id')
+          .eq('user_id', user.id)
+          .limit(1);
+          
+        setIsServiceProvider(providerData && providerData.length > 0);
       } catch (error) {
         console.error("Error fetching profile:", error);
       } finally {
@@ -117,9 +126,19 @@ export function AppSidebar({ open, onOpenChange }: AppSidebarProps) {
       },
     ];
 
+    // Add service provider menu item if user is a provider
+    if (isServiceProvider) {
+      items.splice(4, 0, {
+        icon: Store,
+        label: "Service Provider Dashboard",
+        path: "/provider/dashboard",
+        action: 'navigate'
+      });
+    }
+    
     // Only add admin link for admin users
     if (isAdmin) {
-      items.splice(4, 0, {
+      items.splice(isServiceProvider ? 5 : 4, 0, {
         icon: Settings,
         label: "Admin Dashboard",
         path: "/admin",
