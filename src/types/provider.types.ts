@@ -16,3 +16,8 @@ export interface ProviderLocation {
   latitude: number;
   address: string;
 }
+
+// Add is_active property to match database schema
+export interface ExtendedServiceProvider extends ServiceProvider {
+  is_active: boolean;
+}
