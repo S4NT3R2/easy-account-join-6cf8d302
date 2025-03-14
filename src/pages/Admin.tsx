@@ -95,7 +95,7 @@ const AdminDashboard = () => {
             distance: "0.5 miles", // Placeholder
             cost: Number(provider.cost),
             image: provider.image || "/lovable-uploads/abb66627-cad4-4c4f-8531-2210017f4336.png",
-            location: provider.location,
+            location: provider.location as [number, number],
             is_active: provider.is_active ?? true
           }));
           
@@ -215,8 +215,8 @@ const AdminDashboard = () => {
 
   return (
     <div className="min-h-screen bg-[#1A1F2C] text-white">
-      <div className="container mx-auto px-4 py-6">
-        <div className="flex items-center justify-between mb-6">
+      <div className="container mx-auto px-4 py-6 pb-20">
+        <div className="flex items-center justify-between mb-6 sticky top-0 z-10 bg-[#1A1F2C] py-2">
           <div className="flex items-center gap-3">
             <Button 
               variant="ghost" 
@@ -231,14 +231,14 @@ const AdminDashboard = () => {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid grid-cols-3 mb-6 bg-[#232836]">
+          <TabsList className="grid grid-cols-3 mb-6 bg-[#232836] sticky top-16 z-10">
             <TabsTrigger value="providers" className="data-[state=active]:bg-primary">Service Providers</TabsTrigger>
             <TabsTrigger value="cars" className="data-[state=active]:bg-primary">Cars</TabsTrigger>
             <TabsTrigger value="services" className="data-[state=active]:bg-primary">Services</TabsTrigger>
           </TabsList>
 
           <TabsContent value="providers" className="space-y-4">
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-center flex-wrap gap-2">
               <h2 className="text-xl font-medium">Manage Service Providers</h2>
               <Button className="bg-primary hover:bg-primary/90">
                 <Plus className="h-4 w-4 mr-2" /> Add Provider
@@ -254,9 +254,9 @@ const AdminDashboard = () => {
                 {providers.map(provider => (
                   <div 
                     key={provider.id} 
-                    className="bg-[#232836] p-4 rounded-lg"
+                    className="bg-[#232836] p-4 rounded-lg shadow-lg hover:shadow-primary/10 transition-shadow"
                   >
-                    <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
                       <div className="flex items-center gap-4">
                         <img 
                           src={provider.image} 
@@ -293,7 +293,7 @@ const AdminDashboard = () => {
                     
                     {/* Provider Services List */}
                     <div className="border-t border-gray-700 pt-3 mt-3">
-                      <div className="flex justify-between items-center mb-2">
+                      <div className="flex justify-between items-center mb-2 flex-wrap gap-2">
                         <h4 className="text-sm font-medium text-primary">Services</h4>
                         <Button 
                           size="sm" 
@@ -309,7 +309,7 @@ const AdminDashboard = () => {
                           providerServices[provider.id].map(service => (
                             <div 
                               key={service.id} 
-                              className="flex justify-between items-center p-2 bg-[#1A1F2C] rounded"
+                              className="flex justify-between items-center p-2 bg-[#1A1F2C] rounded hover:bg-[#1A1F2C]/70 transition-colors"
                             >
                               <div>
                                 <div className="font-medium text-sm">{service.name}</div>
@@ -355,17 +355,17 @@ const AdminDashboard = () => {
           </TabsContent>
 
           <TabsContent value="cars" className="space-y-4">
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-center flex-wrap gap-2">
               <h2 className="text-xl font-medium">Manage Cars</h2>
               <Button className="bg-primary hover:bg-primary/90">
                 <Plus className="h-4 w-4 mr-2" /> Add Car
               </Button>
             </div>
-            <div className="grid gap-4">
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {cars.map(car => (
                 <div 
                   key={car.id} 
-                  className="bg-[#232836] p-4 rounded-lg flex items-center justify-between"
+                  className="bg-[#232836] p-4 rounded-lg flex items-center justify-between flex-wrap gap-2 hover:shadow-lg transition-shadow"
                 >
                   <div className="flex items-center gap-4">
                     <img 
@@ -375,7 +375,7 @@ const AdminDashboard = () => {
                     />
                     <div>
                       <h3 className="font-medium">{car.make && car.model ? `${car.year} ${car.make} ${car.model}` : car.name}</h3>
-                      <p className="text-sm text-gray-400">{car.plateNumber}</p>
+                      <p className="text-sm text-gray-400">{car.plateNumber || car.plate_number}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
@@ -396,17 +396,17 @@ const AdminDashboard = () => {
           </TabsContent>
 
           <TabsContent value="services" className="space-y-4">
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-center flex-wrap gap-2">
               <h2 className="text-xl font-medium">Manage Global Services</h2>
               <Button className="bg-primary hover:bg-primary/90">
                 <Plus className="h-4 w-4 mr-2" /> Add Service
               </Button>
             </div>
-            <div className="grid gap-4">
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {services.map(service => (
                 <div 
                   key={service.id} 
-                  className="bg-[#232836] p-4 rounded-lg flex items-center justify-between"
+                  className="bg-[#232836] p-4 rounded-lg flex items-center justify-between flex-wrap gap-2 hover:shadow-lg transition-shadow"
                 >
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 rounded bg-primary/20 flex items-center justify-center">

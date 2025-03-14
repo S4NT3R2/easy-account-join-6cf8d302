@@ -19,6 +19,9 @@ export interface Car {
   licensePlate?: string;
   image: string;
   plateNumber?: string;
+  // Adding these fields to match DB schema
+  brand?: string;
+  plate_number?: string;
 }
 
 export interface ServiceProvider {
@@ -30,4 +33,5 @@ export interface ServiceProvider {
   cost: number;
   image: string;
   location: [number, number];
+  is_active?: boolean;
 }

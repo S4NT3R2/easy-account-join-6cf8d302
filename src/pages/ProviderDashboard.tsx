@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { ServiceProvider } from "@/types/service.types";
-import { ProviderService } from "@/types/provider.types";
+import { ExtendedServiceProvider, ProviderService } from "@/types/provider.types";
 import { 
   Card, CardContent, CardDescription, 
   CardFooter, CardHeader, CardTitle 
@@ -23,7 +23,7 @@ const ProviderDashboard = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
-  const [providerData, setProviderData] = useState<ServiceProvider[]>([]);
+  const [providerData, setProviderData] = useState<ExtendedServiceProvider[]>([]);
   const [services, setServices] = useState<Record<string, ProviderService[]>>({});
 
   // Fetch provider data
@@ -41,7 +41,7 @@ const ProviderDashboard = () => {
         if (error) throw error;
 
         if (data) {
-          // Convert to ServiceProvider format
+          // Convert to ExtendedServiceProvider format
           const providers = data.map(provider => ({
             id: provider.id,
             name: provider.name,
@@ -165,9 +165,9 @@ const ProviderDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#1A1F2C] p-4">
+    <div className="min-h-screen bg-[#1A1F2C] p-4 pb-20">
       <div className="max-w-5xl mx-auto">
-        <div className="flex items-center mb-6">
+        <div className="flex items-center mb-6 sticky top-0 z-10 bg-[#1A1F2C] py-2">
           <Button
             variant="ghost"
             onClick={() => navigate('/home')}
@@ -210,7 +210,7 @@ const ProviderDashboard = () => {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {providerData.map((provider) => (
-                  <Card key={provider.id} className="bg-[#232836] border-0 shadow-lg text-white overflow-hidden">
+                  <Card key={provider.id} className="bg-[#232836] border-0 shadow-lg text-white overflow-hidden hover:shadow-primary/20 transition-shadow">
                     <CardHeader className="pb-3">
                       <div className="flex justify-between items-start">
                         <div>
@@ -247,10 +247,10 @@ const ProviderDashboard = () => {
                       </TabsList>
                       
                       <TabsContent value="services" className="p-4 mt-0">
-                        <div className="space-y-3">
+                        <div className="space-y-3 max-h-[200px] overflow-y-auto pr-1">
                           {services[provider.id]?.length > 0 ? (
                             services[provider.id].map(service => (
-                              <div key={service.id} className="flex justify-between items-center p-3 bg-[#1A1F2C] rounded-lg">
+                              <div key={service.id} className="flex justify-between items-center p-3 bg-[#1A1F2C] rounded-lg hover:bg-[#1A1F2C]/70 transition-colors">
                                 <div>
                                   <h4 className="font-medium">{service.name}</h4>
                                   <div className="flex items-center text-primary text-sm mt-1">

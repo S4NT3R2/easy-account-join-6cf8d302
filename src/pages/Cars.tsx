@@ -63,30 +63,30 @@ const CarsPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#1A1F2C] p-4">
+    <div className="min-h-screen bg-[#1A1F2C] p-4 pb-20">
       {/* Header */}
-      <div className="flex items-center gap-4 mb-6">
+      <div className="flex items-center gap-4 mb-6 sticky top-0 z-10 bg-[#1A1F2C] py-2">
         <Link to="/home" className="text-primary hover:text-primary/80">
           <ArrowLeft className="w-6 h-6" />
         </Link>
-        <h1 className="text-xl font-semibold text-white">My cars</h1>
+        <h1 className="text-xl font-semibold text-white">My Cars</h1>
       </div>
 
       {/* Car List */}
-      <div className="space-y-4">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {loading ? (
-          <div className="flex justify-center py-8">
+          <div className="flex justify-center py-8 col-span-full">
             <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
           </div>
         ) : cars.length === 0 ? (
-          <div className="py-8 text-center text-gray-400">
+          <div className="py-8 text-center text-gray-400 col-span-full">
             <p>No cars added yet. Add your first car.</p>
           </div>
         ) : (
           cars.map((car) => (
             <div 
               key={car.id}
-              className="relative rounded-xl overflow-hidden bg-[#232836] group hover:ring-2 hover:ring-primary/50 transition-all"
+              className="relative rounded-xl overflow-hidden bg-[#232836] hover:ring-2 hover:ring-primary/50 transition-all shadow-lg"
             >
               <img 
                 src={car.image || "/placeholder.svg"} 
@@ -98,8 +98,8 @@ const CarsPage = () => {
                 <div className="flex items-start justify-between">
                   <div>
                     <h3 className="text-lg font-medium text-white">{car.name}</h3>
-                    <p className="text-sm text-gray-400">{car.brand}</p>
-                    <p className="text-xs text-gray-500 mt-1">{car.plate_number}</p>
+                    <p className="text-sm text-gray-400">{car.brand || car.make}</p>
+                    <p className="text-xs text-gray-500 mt-1">{car.plateNumber || car.plate_number}</p>
                   </div>
                   <div className="relative">
                     <button 

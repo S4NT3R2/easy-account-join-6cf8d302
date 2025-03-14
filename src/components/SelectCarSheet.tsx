@@ -1,6 +1,6 @@
 
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { Car as CarIcon, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import { Car } from "@/types/service.types";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
@@ -48,11 +48,11 @@ export function SelectCarSheet({ open, onOpenChange, selectedCar, onSelectCar }:
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="bottom" className="h-[85vh] bg-[#1A1F2C] border-t border-border p-0">
+      <SheetContent side="bottom" className="h-[85vh] bg-[#1A1F2C] border-t border-border p-0 rounded-t-2xl">
         <SheetHeader className="p-4 border-b border-border">
           <SheetTitle className="text-lg font-semibold text-white">Select Car</SheetTitle>
         </SheetHeader>
-        <div className="p-4 space-y-4">
+        <div className="p-4 space-y-4 overflow-y-auto max-h-[calc(85vh-80px)]">
           {loading ? (
             <div className="flex justify-center p-4">
               <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-primary"></div>
@@ -83,7 +83,7 @@ export function SelectCarSheet({ open, onOpenChange, selectedCar, onSelectCar }:
                   <img src={car.image || "/placeholder.svg"} alt={car.name} className="w-12 h-12 rounded-full object-cover" />
                   <div className="flex-1 text-left">
                     <div className="text-sm font-medium text-white">{car.name}</div>
-                    <div className="text-xs text-muted-foreground">{car.plate_number}</div>
+                    <div className="text-xs text-muted-foreground">{car.plateNumber || car.plate_number}</div>
                   </div>
                   <div
                     className={`w-6 h-6 rounded-full border-2 transition-all duration-300 ${
